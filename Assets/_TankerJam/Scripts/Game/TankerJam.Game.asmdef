@@ -1,0 +1,11 @@
+{
+    "name": "TankerJam.Game",
+    "rootNamespace": "TankerJam.Game",
+    "references": [
+        "TankerJam.Core",
+        "Unity.InputSystem",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime"
+    ],
+    "autoReferenced": true
+}

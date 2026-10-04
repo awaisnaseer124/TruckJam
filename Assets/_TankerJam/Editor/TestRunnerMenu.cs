@@ -1,6 +1,7 @@
-// Menu: Tanker Jam > Tests > Run EditMode. Runs the project's EditMode tests and writes a plain-text
+// Menu: Tanker Jam > Tests > Run EditMode / Run PlayMode. Runs the project's tests and writes a plain-text
 // summary to Temp/TankerJamTests.txt (also logged to the console), so results can be read without the
-// Test Runner window (CI, MCP automation).
+// Test Runner window (CI, MCP automation). The results callback is registered on every domain load
+// because PlayMode runs reload the domain mid-run.
 using System.IO;
 using System.Text;
 using UnityEditor;
@@ -9,18 +10,28 @@ using UnityEngine;
 
 namespace TankerJam.EditorTools
 {
+    [InitializeOnLoad]
     public static class TestRunnerMenu
     {
         public const string ResultPath = "Temp/TankerJamTests.txt";
-        const string Assembly = "TankerJam.Tests.EditMode";
+
+        static TestRunnerMenu()
+        {
+            var api = ScriptableObject.CreateInstance<TestRunnerApi>();
+            api.RegisterCallbacks(new Callbacks());
+        }
 
         [MenuItem("Tanker Jam/Tests/Run EditMode")]
-        public static void RunEditMode()
+        public static void RunEditMode() => Run(TestMode.EditMode, "TankerJam.Tests.EditMode");
+
+        [MenuItem("Tanker Jam/Tests/Run PlayMode")]
+        public static void RunPlayMode() => Run(TestMode.PlayMode, "TankerJam.Tests.PlayMode");
+
+        static void Run(TestMode mode, string assembly)
         {
             if (File.Exists(ResultPath)) File.Delete(ResultPath);
             var api = ScriptableObject.CreateInstance<TestRunnerApi>();
-            api.RegisterCallbacks(new Callbacks());
-            api.Execute(new ExecutionSettings(new Filter { testMode = TestMode.EditMode, assemblyNames = new[] { Assembly } }));
+            api.Execute(new ExecutionSettings(new Filter { testMode = mode, assemblyNames = new[] { assembly } }));
         }
 
         sealed class Callbacks : ICallbacks
@@ -32,7 +43,7 @@ namespace TankerJam.EditorTools
             public void RunFinished(ITestResultAdaptor result)
             {
                 var sb = new StringBuilder();
-                sb.AppendLine($"Tanker Jam EditMode: passed {result.PassCount}, failed {result.FailCount}, skipped {result.SkipCount}");
+                sb.AppendLine($"Tanker Jam tests ({result.Name}): passed {result.PassCount}, failed {result.FailCount}, skipped {result.SkipCount}");
                 Append(result, sb);
                 File.WriteAllText(ResultPath, sb.ToString());
                 if (result.FailCount > 0) Debug.LogError(sb.ToString());

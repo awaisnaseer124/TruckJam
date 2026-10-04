@@ -34,6 +34,9 @@ namespace TankerJam.EditorTools
             PlayerSettings.allowedAutorotateToLandscapeLeft = false;
             PlayerSettings.allowedAutorotateToLandscapeRight = false;
             PlayerSettings.colorSpace = ColorSpace.Linear;
+            // Keeps Play mode ticking while the Editor is unfocused (automation, side-by-side testing).
+            // Mobile platforms ignore this flag.
+            PlayerSettings.runInBackground = true;
 
             var android = NamedBuildTarget.Android;
             PlayerSettings.SetScriptingBackend(android, ScriptingImplementation.IL2CPP);

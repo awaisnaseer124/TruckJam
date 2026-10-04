@@ -3,6 +3,7 @@
     "rootNamespace": "TankerJam.EditorTools",
     "references": [
         "TankerJam.Core",
+        "TankerJam.Game",
         "UnityEditor.TestRunner",
         "UnityEngine.TestRunner",
         "Unity.RenderPipelines.Core.Runtime",

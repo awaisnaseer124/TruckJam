@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 624a56754bb956646a7ce87e4546c8d6, type: 3}
+  m_Name: LayoutConfig
+  m_EditorClassIdentifier: TankerJam.Game::TankerJam.Game.LayoutConfig
+  Board:
+    LotZ0: 0
+    RingMargin: 0.8
+    RingTopGap: 0.75
+    RoadWidth: 1.2
+    BaySpacing: 1.4
+    BayWidth: 1.18
+    BayLength: 4.1
+    HoseZ: -3.75
+    BayPlaneOffsetZ: -0.3
+    HeaderY: 2.6
+    HeaderOffsetZ: -1.3
+    ExitZ: -7.1
+    ExitSideX: 22
+    PumpZ: -9.3
+    VesselSpacing: 2.6
+    VesselZ: -11.6
+    VesselRadius: 0.74
+    VesselUnitHeight: 0.42
+    VesselBaseY: 1
+    ManifoldY: 0.55
+    CornerRadius: 0.7
+    LeaveCornerRadius: 0.8
+  FieldOfView: 36
+  Pitch: 53
+  FitMargin: 0.4

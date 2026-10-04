@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 127f7a659b68a9e4a977983ab269ed5b, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: TankerJam.Game::TankerJam.Game.GameConfig
+  Palette: {fileID: 11400000, guid: 1ab062618e108584db7b194e3790c597, type: 2}
+  Tuning: {fileID: 11400000, guid: f488312f8990e4149b9cb024cda79466, type: 2}
+  Layout: {fileID: 11400000, guid: 7bcb968fce9fbf0478a69e31d3ab025d, type: 2}
+  TruckPrefabs:
+  - {fileID: 1840949088437107872, guid: bd54fb82c6b798e4b908f9284136185c, type: 3}
+  - {fileID: 3037599380132342787, guid: d547c3f55871f4345b906ea232af86a2, type: 3}
+  - {fileID: 5222780092766751064, guid: 60d50870d5132714598904abd7790b65, type: 3}
+  ToyLit: {fileID: 4800000, guid: 06e25fdc48a276143a732c89ee374fd3, type: 3}
+  ToyTransparent: {fileID: 4800000, guid: 24c488b9fba5ef648b999a04b6483bdf, type: 3}
+  LiquidFill: {fileID: 4800000, guid: ed7852986fdcad444ae306f392c1f9ef, type: 3}
+  Decal: {fileID: 4800000, guid: 97c50a996489fa44e821650d211e5f98, type: 3}
+  DecalAtlas: {fileID: 2800000, guid: bdda1697c291e9e48aa81897d0a3f377, type: 3}
+  TruckLayer: Trucks
