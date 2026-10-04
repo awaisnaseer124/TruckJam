@@ -1,6 +1,7 @@
 // Plays out one truck: bump when blocked, drive the ring road to a bay, VIP-lift arc, park, fill,
 // leave. Pure presentation - every decision was already made by GameSession at tap time.
 // Motion and spring constants are the web prototype's (see GameTuning).
+using DG.Tweening;
 using TankerJam.Core;
 using UnityEngine;
 
@@ -68,10 +69,15 @@ namespace TankerJam.Game
         // Springs.
         float slosh, sloshV, pitch, pitchV, wheelAngle, roll;
 
+        readonly Tween punch;
+
         public TruckView(TruckRig rig)
         {
             Rig = rig;
             Transform = rig.transform;
+            // Built once and restarted on demand, so the juice allocates nothing during play.
+            punch = Rig.Body.DOPunchScale(new Vector3(0.08f, 0.14f, 0.08f), 0.35f, 6, 0.6f)
+                            .SetAutoKill(false).SetRecyclable(false).Pause();
         }
 
         public void Setup(TruckDef def, BoardLayout layout, MaterialLibrary mats, GameTuning gameTuning)
@@ -92,10 +98,13 @@ namespace TankerJam.Game
             home = new Vector3(h.X, 0f, h.Z);
             yaw = YawOf(def.Facing);
             Transform.SetPositionAndRotation(home, Quaternion.Euler(0f, yaw * Mathf.Rad2Deg, 0f));
+            punch.Rewind();
             Rig.Body.localRotation = Quaternion.identity;
+            Rig.Body.localScale = Vector3.one;
 
             Rig.BodyRenderer.sharedMaterial = mats.Body(def.Color);
-            foreach (var axle in Rig.Axles) axle.GetComponent<MeshRenderer>().sharedMaterial = mats.VertexColored;
+            foreach (var axle in Rig.Axles)
+                if (axle.TryGetComponent<MeshRenderer>(out var wheels)) wheels.sharedMaterial = mats.VertexColored;
             Rig.ShellRenderer.sharedMaterial = mats.Shell(def.Color);
             Rig.LiquidRenderer.sharedMaterial = mats.Liquid(def.Color);
             Rig.DecalRenderer.sharedMaterial = mats.Decals;
@@ -150,6 +159,9 @@ namespace TankerJam.Game
         {
             if (State == TruckState.Parked) State = TruckState.Filling;
         }
+
+        /// <summary>Little "I'm full" squash on the body (juice; event-driven, not per frame).</summary>
+        public void PunchFull() => punch.Restart();
 
         public void AddFill(float amount)
         {

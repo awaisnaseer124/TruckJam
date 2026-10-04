@@ -13,9 +13,10 @@ namespace TankerJam.Game
         const float Y = 0.03f, Line = 0.07f;
 
         readonly MeshKit kit = new MeshKit();
-        readonly MeshFilter filter;
+        readonly MeshKit decalKit = new MeshKit();
+        readonly MeshFilter filter, decalFilter;
         readonly bool[] lastOpen = new bool[16];
-        Mesh mesh;
+        Mesh mesh, decalMesh;
 
         public BayRowView(Transform parent, MaterialLibrary mats)
         {
@@ -26,11 +27,20 @@ namespace TankerJam.Game
             r.sharedMaterial = mats.VertexColored;
             r.shadowCastingMode = ShadowCastingMode.Off;
             r.lightProbeUsage = LightProbeUsage.Off;
+
+            var d = new GameObject("BayLabels");
+            d.transform.SetParent(parent, false);
+            decalFilter = d.AddComponent<MeshFilter>();
+            var dr = d.AddComponent<MeshRenderer>();
+            dr.sharedMaterial = mats.Decals;
+            dr.shadowCastingMode = ShadowCastingMode.Off;
+            dr.lightProbeUsage = LightProbeUsage.Off;
         }
 
         public void Rebuild(IReadOnlyList<Bay> bays, BoardLayout L, Palette pal)
         {
             kit.Clear();
+            decalKit.Clear();
             float w = L.P.BayWidth, len = L.P.BayLength, z = L.BayPlaneZ;
             for (int i = 0; i < bays.Count; i++)
             {
@@ -48,10 +58,18 @@ namespace TankerJam.Game
                 var c = MeshKit.Fixed(bay.Kind == BayKind.Vip ? pal.Vip : Color.white);
                 Outline(x, z, w - 0.1f, len - 0.1f, c);
                 if (bay.Kind == BayKind.Vip)
-                    kit.Quad(new Vector3(x, Y, z + len / 2f - 0.6f), w - 0.35f, 0.5f, c); // gold header strip
+                {
+                    // "VIP" along the bay near its bottom end, reading up the screen (local X -> world -Z).
+                    var gold = (Color32)pal.Vip.linear;
+                    gold.a = 255;
+                    var m = Matrix4x4.TRS(new Vector3(x, Y + 0.002f, z + len / 2f - 0.95f), Quaternion.Euler(0f, 90f, 0f), Vector3.one);
+                    decalKit.Quad(m, 1.29f, 0.43f, gold, DecalAtlasLayout.Vip);
+                }
             }
             mesh = kit.ToMesh("BayOutlines", mesh);
             filter.sharedMesh = mesh;
+            decalMesh = decalKit.ToMesh("BayLabels", decalMesh);
+            decalFilter.sharedMesh = decalMesh;
         }
 
         /// <summary>Rebuilds only if an open state changed since the last build.</summary>

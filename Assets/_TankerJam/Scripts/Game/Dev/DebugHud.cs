@@ -11,19 +11,24 @@ namespace TankerJam.Game
         [Tooltip("Taps the stored solution automatically (gate check: the level wins end to end).")]
         public bool AutoSolve;
         [Range(0.25f, 8f)] public float TimeScale = 1f;
+        public bool ShowStats = true;
 
         readonly SolutionPlayer solver = new SolutionPlayer();
-        float solveTimer;
+        RenderStats stats;
+        float solveTimer, fps;
         GUIStyle label, button;
 
         void OnEnable()
         {
             if (game != null) game.LevelEnded += OnEnded;
+            stats = new RenderStats();
         }
 
         void OnDisable()
         {
             if (game != null) game.LevelEnded -= OnEnded;
+            stats?.Dispose();
+            stats = null;
         }
 
         void OnEnded(EndState state) => Debug.Log($"Tanker Jam: level ended: {state} (t={Time.time:0.0}s)");
@@ -37,6 +42,7 @@ namespace TankerJam.Game
         void Update()
         {
             Time.timeScale = TimeScale;
+            fps = Mathf.Lerp(fps, 1f / Mathf.Max(1e-4f, Time.unscaledDeltaTime), 0.05f);
             if (!AutoSolve) return;
             solveTimer -= Time.unscaledDeltaTime;
             if (solveTimer > 0f) return;
@@ -56,6 +62,11 @@ namespace TankerJam.Game
             float w = Screen.width, pad = 8 * s, bh = 40 * s;
             if (GUI.Button(new Rect(pad, pad, 90 * s, bh), "Retry", button)) Restart();
             AutoSolve = GUI.Toggle(new Rect(w - 130 * s - pad, pad, 130 * s, bh), AutoSolve, " Auto-solve", button);
+            if (GUI.Button(new Rect(pad + 98 * s, pad, 90 * s, bh), AudioManager.Muted ? "Sound off" : "Sound on", button))
+                AudioManager.Muted = !AudioManager.Muted;
+            if (ShowStats && stats != null)
+                GUI.Label(new Rect(pad, pad + bh + 4 * s, 260 * s, 110 * s),
+                    $"{fps:0} fps\ndraw {stats.DrawCalls}  batch {stats.Batches}  setpass {stats.SetPass}\ntris {stats.Triangles / 1000}k  gc {stats.GcBytes} B  blobs {game.ActiveBlobCount}");
 
             var session = game.Session;
             float y = Screen.height - bh - pad;

@@ -119,7 +119,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &161068827
+--- !u!1 &28310329
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,10 +127,11 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 161068831}
-  - component: {fileID: 161068829}
-  - component: {fileID: 161068830}
-  - component: {fileID: 161068828}
+  - component: {fileID: 28310334}
+  - component: {fileID: 28310331}
+  - component: {fileID: 28310333}
+  - component: {fileID: 28310330}
+  - component: {fileID: 28310332}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -138,13 +139,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &161068828
+--- !u!114 &28310330
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 161068827}
+  m_GameObject: {fileID: 28310329}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9eef2a77b8b4a7c49b67d775612a1ceb, type: 3}
@@ -152,13 +153,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: TankerJam.Game::TankerJam.Game.CameraFitter
   TopInset: 0.08
   BottomInset: 0.12
---- !u!20 &161068829
+--- !u!20 &28310331
 Camera:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 161068827}
+  m_GameObject: {fileID: 28310329}
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
@@ -203,13 +204,21 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &161068830
+--- !u!81 &28310332
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 28310329}
+  m_Enabled: 1
+--- !u!114 &28310333
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 161068827}
+  m_GameObject: {fileID: 28310329}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
@@ -247,13 +256,13 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!4 &161068831
+--- !u!4 &28310334
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 161068827}
+  m_GameObject: {fileID: 28310329}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -262,7 +271,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &497258870
+--- !u!1 &571241511
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -270,36 +279,36 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 497258872}
-  - component: {fileID: 497258871}
+  - component: {fileID: 571241513}
+  - component: {fileID: 571241512}
   m_Layer: 0
-  m_Name: Lighting
+  m_Name: Audio
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &497258871
+--- !u!114 &571241512
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 497258870}
+  m_GameObject: {fileID: 571241511}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c44258d2cf39e24392f36326194e4bf, type: 3}
+  m_Script: {fileID: 11500000, guid: f2885371e77dcf440b8bbdaa9f5cd99c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: TankerJam.Game::TankerJam.Game.LightingRig
-  Sun: {fileID: 954485704}
-  SunPosition: {x: -5, y: 20, z: 8}
---- !u!4 &497258872
+  m_EditorClassIdentifier: TankerJam.Game::TankerJam.Game.AudioManager
+  game: {fileID: 1886102561}
+  catalog: {fileID: 11400000, guid: c350ff5cdd4babe449370645e96f49ac, type: 2}
+--- !u!4 &571241513
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 497258870}
+  m_GameObject: {fileID: 571241511}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -308,7 +317,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &954485703
+--- !u!1 &608231898
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -316,8 +325,55 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 954485705}
-  - component: {fileID: 954485704}
+  - component: {fileID: 608231900}
+  - component: {fileID: 608231899}
+  m_Layer: 0
+  m_Name: Confetti
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &608231899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 608231898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 399f489e7925c5744a11f5e13e6a414b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TankerJam.Game::TankerJam.Game.ConfettiFx
+  game: {fileID: 1886102561}
+  particleShader: {fileID: 4800000, guid: 112aa6de1d2667147a79a8a988a08595, type: 3}
+  burstCount: 140
+--- !u!4 &608231900
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 608231898}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1078133338
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1078133340}
+  - component: {fileID: 1078133339}
   m_Layer: 0
   m_Name: Sun
   m_TagString: Untagged
@@ -325,13 +381,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!108 &954485704
+--- !u!108 &1078133339
 Light:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 954485703}
+  m_GameObject: {fileID: 1078133338}
   m_Enabled: 1
   serializedVersion: 13
   m_Type: 1
@@ -390,13 +446,13 @@ Light:
   m_LightUnit: 1
   m_LuxAtDistance: 1
   m_EnableSpotReflector: 1
---- !u!4 &954485705
+--- !u!4 &1078133340
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 954485703}
+  m_GameObject: {fileID: 1078133338}
   serializedVersion: 2
   m_LocalRotation: {x: 0.14761, y: 0.8118482, z: -0.5146859, w: 0.23283501}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -405,7 +461,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1396653599
+--- !u!1 &1663984084
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -413,9 +469,55 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1396653602}
-  - component: {fileID: 1396653601}
-  - component: {fileID: 1396653600}
+  - component: {fileID: 1663984086}
+  - component: {fileID: 1663984085}
+  m_Layer: 0
+  m_Name: Lighting
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1663984085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1663984084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c44258d2cf39e24392f36326194e4bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TankerJam.Game::TankerJam.Game.LightingRig
+  Sun: {fileID: 1078133339}
+  SunPosition: {x: -5, y: 20, z: 8}
+--- !u!4 &1663984086
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1663984084}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1886102560
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1886102563}
+  - component: {fileID: 1886102561}
+  - component: {fileID: 1886102562}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -423,47 +525,48 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1396653600
+--- !u!114 &1886102561
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1396653599}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: faeeb6110f2f20b4d9a4aa336fc7f65b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: TankerJam.Game::TankerJam.Game.DebugHud
-  game: {fileID: 1396653601}
-  AutoSolve: 0
-  TimeScale: 1
---- !u!114 &1396653601
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1396653599}
+  m_GameObject: {fileID: 1886102560}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 89ae1432dcd438c489361bcf963fee4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: TankerJam.Game::TankerJam.Game.GameController
   config: {fileID: 11400000, guid: 07c3dadcac075fc44a8e57de952ec933, type: 2}
-  gameCamera: {fileID: 161068829}
-  cameraFitter: {fileID: 161068828}
-  lighting: {fileID: 497258871}
+  gameCamera: {fileID: 28310331}
+  cameraFitter: {fileID: 28310330}
+  lighting: {fileID: 1663984085}
   startLevel: {fileID: 4900000, guid: 768241cf2e9026444b0a8ab8f9180608, type: 3}
   startVipBoosters: 1
   startExtraBoosters: 1
---- !u!4 &1396653602
+--- !u!114 &1886102562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1886102560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: faeeb6110f2f20b4d9a4aa336fc7f65b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: TankerJam.Game::TankerJam.Game.DebugHud
+  game: {fileID: 1886102561}
+  AutoSolve: 0
+  TimeScale: 1
+  ShowStats: 1
+--- !u!4 &1886102563
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1396653599}
+  m_GameObject: {fileID: 1886102560}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -476,7 +579,9 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 161068831}
-  - {fileID: 954485705}
-  - {fileID: 497258872}
-  - {fileID: 1396653602}
+  - {fileID: 28310334}
+  - {fileID: 1078133340}
+  - {fileID: 1663984086}
+  - {fileID: 1886102563}
+  - {fileID: 571241513}
+  - {fileID: 608231900}

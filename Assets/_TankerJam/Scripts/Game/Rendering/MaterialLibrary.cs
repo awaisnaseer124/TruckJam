@@ -19,18 +19,25 @@ namespace TankerJam.Game
         readonly Dictionary<char, Material> shell = new Dictionary<char, Material>();
         readonly Dictionary<char, Material> liquid = new Dictionary<char, Material>();
         readonly Dictionary<char, Material> oil = new Dictionary<char, Material>();
+        readonly Dictionary<char, Material> blob = new Dictionary<char, Material>();
         readonly Dictionary<Color, Material> plain = new Dictionary<Color, Material>();
 
         public Material VertexColored { get; }
         public Material Glass { get; }
         public Material Decals { get; }
+        /// <summary>All of a vessel's oil layers in one draw (colors come from a property block).</summary>
+        public Material VesselLiquid { get; }
 
         public MaterialLibrary(GameConfig config)
         {
             this.config = config;
             VertexColored = Make(config.ToyLit, "VertexColored", Color.white, 0.45f, 0.2f);
-            Glass = MakeTransparent("Glass", new Color(1f, 1f, 1f, 0.26f), 0.95f, CullMode.Off);
+            // Front faces only, and faint: blending happens in linear space, where a white veil brightens far
+            // more than in the prototype's gamma-space blending. The fresnel rim carries the "glass" read.
+            Glass = MakeTransparent("Glass", new Color(1f, 1f, 1f, 0.07f), 0.95f, CullMode.Back);
+            Glass.SetFloat("_Rim", 0.35f);
             Decals = new Material(config.Decal) { name = "Decals", enableInstancing = true };
+            VesselLiquid = new Material(config.VesselLiquid) { name = "VesselLiquid" };
             if (config.DecalAtlas != null) Decals.SetTexture(BaseMapId, config.DecalAtlas);
         }
 
@@ -75,6 +82,9 @@ namespace TankerJam.Game
         /// <summary>Plain oil color for vessel layers and flow blobs.</summary>
         public Material OilSurface(char key) => Get(oil, key, k => Make(config.ToyLit, $"Oil_{k}", Oil(k), 0.78f, 0.35f, 0.08f));
 
+        /// <summary>Flow blobs: a slightly glowing oil color, instancing on (drawn with RenderMeshInstanced).</summary>
+        public Material Blob(char key) => Get(blob, key, k => Make(config.ToyLit, $"Blob_{k}", Oil(k), 0.8f, 0.3f, 0.3f));
+
         /// <summary>Flat-colored lit material (props that don't use vertex colors).</summary>
         public Material Plain(Color color)
         {
@@ -99,8 +109,8 @@ namespace TankerJam.Game
         public void Dispose()
         {
             void Kill(IEnumerable<Material> ms) { foreach (var m in ms) Object.Destroy(m); }
-            Kill(body.Values); Kill(shell.Values); Kill(liquid.Values); Kill(oil.Values); Kill(plain.Values);
-            Object.Destroy(VertexColored); Object.Destroy(Glass); Object.Destroy(Decals);
+            Kill(body.Values); Kill(shell.Values); Kill(liquid.Values); Kill(oil.Values); Kill(blob.Values); Kill(plain.Values);
+            Object.Destroy(VertexColored); Object.Destroy(Glass); Object.Destroy(Decals); Object.Destroy(VesselLiquid);
         }
     }
 }

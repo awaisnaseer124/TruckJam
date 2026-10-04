@@ -15,6 +15,8 @@ namespace TankerJam.EditorTools
         const string ScenePath = "Assets/_TankerJam/Scenes/Game.unity";
         const string ConfigPath = "Assets/_TankerJam/Config/GameConfig.asset";
         const string StartLevelPath = "Assets/_TankerJam/Data/Levels/level_005.json";
+        const string AudioCatalogPath = "Assets/_TankerJam/Config/AudioCatalog.asset";
+        const string ParticleShaderPath = "Assets/_TankerJam/Art/Shaders/Particle.shader";
 
         [MenuItem("Tanker Jam/Setup/Create Game Scene")]
         public static void CreateGameScene()
@@ -62,6 +64,23 @@ namespace TankerJam.EditorTools
             var hudSo = new SerializedObject(hud);
             hudSo.FindProperty("game").objectReferenceValue = controller;
             hudSo.ApplyModifiedPropertiesWithoutUndo();
+
+            // Audio: listener on the camera, cue-driven manager with an (initially empty) recorded-clip catalog.
+            camGo.AddComponent<AudioListener>();
+            var catalog = AssetDatabase.LoadAssetAtPath<AudioCatalog>(AudioCatalogPath);
+            if (catalog == null)
+            {
+                catalog = ScriptableObject.CreateInstance<AudioCatalog>();
+                AssetDatabase.CreateAsset(catalog, AudioCatalogPath);
+            }
+            var audio = new GameObject("Audio").AddComponent<AudioManager>();
+            audio.EditorWire(controller, catalog);
+            EditorUtility.SetDirty(audio);
+
+            // Win confetti.
+            var confetti = new GameObject("Confetti").AddComponent<ConfettiFx>();
+            confetti.EditorWire(controller, AssetDatabase.LoadAssetAtPath<Shader>(ParticleShaderPath));
+            EditorUtility.SetDirty(confetti);
 
             RenderSettings.ambientMode = AmbientMode.Flat;
             RenderSettings.ambientLight = Color.black;

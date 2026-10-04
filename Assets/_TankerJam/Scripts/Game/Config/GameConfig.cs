@@ -19,6 +19,7 @@ namespace TankerJam.Game
         public Shader ToyTransparent;
         public Shader LiquidFill;
         public Shader Decal;
+        public Shader VesselLiquid;
 
         [Header("Textures")]
         public Texture2D DecalAtlas;

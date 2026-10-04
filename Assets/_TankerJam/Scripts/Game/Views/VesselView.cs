@@ -1,6 +1,7 @@
-// A glass vessel's oil layers. Each layer is one stacked cylinder; draining the bottom layer makes
-// everything above sink smoothly. Small squash on the bottom layer while the tap is open and a wobble
-// on the top surface (prototype syncVessel()).
+// A glass vessel's oil column. Layers are tracked logically (color + remaining amount); the whole column is
+// ONE cylinder drawn with the VesselLiquid shader, which picks each layer's color by height from arrays in a
+// MaterialPropertyBlock. Draining the bottom layer makes everything above sink smoothly; small squash while
+// the tap is open and a wobble on the top surface (prototype syncVessel()).
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -9,65 +10,65 @@ namespace TankerJam.Game
 {
     public sealed class VesselView
     {
+        public const int MaxLayers = 16;
+        static readonly int CountId = Shader.PropertyToID("_LayerCount");
+        static readonly int TopsId = Shader.PropertyToID("_LayerTop");
+        static readonly int ColorsId = Shader.PropertyToID("_LayerColor");
+
         struct Layer
         {
             public char Color;
             public float Amount; // 1 = full unit, 0 = gone
-            public Transform T;
         }
 
-        readonly List<Layer> layers = new List<Layer>(16);
-        readonly Stack<Transform> pool = new Stack<Transform>(16);
-        readonly Transform root;
+        readonly List<Layer> layers = new List<Layer>(MaxLayers);
+        readonly Transform root, column;
+        readonly MeshRenderer renderer;
+        readonly MaterialPropertyBlock block = new MaterialPropertyBlock();
+        readonly float[] tops = new float[MaxLayers];
+        readonly Vector4[] colors = new Vector4[MaxLayers];
+        Palette palette;
         float radius, unitHeight, baseY;
         float wave, valve;
+        bool colorsDirty;
 
-        public VesselView(Transform parent, string name)
+        public VesselView(Transform parent, string name, Material liquid)
         {
             root = new GameObject(name).transform;
             root.SetParent(parent, false);
+            var g = new GameObject("Oil");
+            g.transform.SetParent(root, false);
+            g.AddComponent<MeshFilter>().sharedMesh = SharedMeshes.UnitCylinder;
+            renderer = g.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = liquid;
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
+            renderer.lightProbeUsage = LightProbeUsage.Off;
+            renderer.reflectionProbeUsage = ReflectionProbeUsage.Off;
+            column = g.transform;
         }
 
         public int LayerCount => layers.Count;
 
-        public void Setup(Vector3 position, IReadOnlyList<char> units, float vesselRadius, float layerHeight, float baseHeight, MaterialLibrary mats)
+        public void Setup(Vector3 position, IReadOnlyList<char> units, float vesselRadius, float layerHeight, float baseHeight, Palette pal)
         {
-            Clear();
+            layers.Clear();
+            palette = pal;
+            root.gameObject.SetActive(true);
             root.localPosition = position;
             radius = vesselRadius;
             unitHeight = layerHeight;
             baseY = baseHeight + 0.02f;
             wave = valve = 0f;
-            foreach (char c in units)
-            {
-                var t = pool.Count > 0 ? pool.Pop() : NewLayerObject();
-                t.gameObject.SetActive(true);
-                t.GetComponent<MeshRenderer>().sharedMaterial = mats.OilSurface(c);
-                layers.Add(new Layer { Color = c, Amount = 1f, T = t });
-            }
+            if (units.Count > MaxLayers) Debug.LogError($"Vessel has {units.Count} units; the shader supports {MaxLayers}.");
+            for (int i = 0; i < units.Count && i < MaxLayers; i++) layers.Add(new Layer { Color = units[i], Amount = 1f });
+            colorsDirty = true;
             Layout(0f);
-        }
-
-        Transform NewLayerObject()
-        {
-            var g = new GameObject("Layer");
-            g.transform.SetParent(root, false);
-            g.AddComponent<MeshFilter>().sharedMesh = SharedMeshes.UnitCylinder;
-            var r = g.AddComponent<MeshRenderer>();
-            r.shadowCastingMode = ShadowCastingMode.Off;
-            r.lightProbeUsage = LightProbeUsage.Off;
-            r.reflectionProbeUsage = ReflectionProbeUsage.Off;
-            return g.transform;
         }
 
         public void Clear()
         {
-            foreach (var l in layers)
-            {
-                l.T.gameObject.SetActive(false);
-                pool.Push(l.T);
-            }
             layers.Clear();
+            root.gameObject.SetActive(false);
         }
 
         /// <summary>Removes up to <paramref name="amount"/> from the bottom layer. Returns what was actually removed.</summary>
@@ -95,10 +96,8 @@ namespace TankerJam.Game
 
         void RemoveBottom()
         {
-            var t = layers[0].T;
-            t.gameObject.SetActive(false);
-            pool.Push(t);
             layers.RemoveAt(0);
+            colorsDirty = true;
         }
 
         public void Tick(float dt, float time)
@@ -110,18 +109,36 @@ namespace TankerJam.Game
 
         void Layout(float time)
         {
-            float y = baseY;
             int n = layers.Count;
+            if (n == 0)
+            {
+                if (renderer.enabled) renderer.enabled = false;
+                return;
+            }
+            if (!renderer.enabled) renderer.enabled = true;
+
+            float total = 0f;
+            for (int i = 0; i < n; i++) total += Mathf.Max(0.001f, unitHeight * layers[i].Amount);
+            float wob = Mathf.Sin(time * 9f) * wave * 0.03f;
+            float height = Mathf.Max(0.002f, total + wob);
+
+            float y = 0f;
             for (int i = 0; i < n; i++)
             {
-                var l = layers[i];
-                float h = Mathf.Max(0.001f, unitHeight * l.Amount);
-                float wob = i == n - 1 ? Mathf.Sin(time * 9f) * wave * 0.03f : 0f;
-                float sq = i == 0 ? 1f + Mathf.Sin(time * 16f) * valve * 0.015f : 1f;
-                l.T.localScale = new Vector3(radius * sq, h + wob, radius * sq);
-                l.T.localPosition = new Vector3(0f, y + (h + wob) / 2f, 0f);
-                y += h;
+                y += Mathf.Max(0.001f, unitHeight * layers[i].Amount);
+                tops[i] = i == n - 1 ? 1f : y / height;
+                if (colorsDirty) colors[i] = palette.OilColorOf(layers[i].Color).linear;
             }
+            colorsDirty = false;
+
+            float sq = 1f + Mathf.Sin(time * 16f) * valve * 0.015f;
+            column.localScale = new Vector3(radius * sq, height, radius * sq);
+            column.localPosition = new Vector3(0f, baseY + height / 2f, 0f);
+
+            block.SetFloat(CountId, n);
+            block.SetFloatArray(TopsId, tops);
+            block.SetVectorArray(ColorsId, colors);
+            renderer.SetPropertyBlock(block);
         }
     }
 }

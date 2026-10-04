@@ -23,13 +23,6 @@ namespace TankerJam.EditorTools
         const string AtlasPath = TexDir + "/DecalAtlas.png";
         public const string TruckLayer = "Trucks";
 
-        // Decal atlas layout (512 x 256): arrow cell 128x256 on the left, badges 128x128 in the top row.
-        public static readonly Rect ArrowUV = new Rect(0f, 0f, 0.25f, 1f);
-        public static Rect BadgeUV(int capacity)
-        {
-            int slot = capacity == 2 ? 0 : capacity == 4 ? 1 : 2;
-            return new Rect(0.25f + slot * 0.25f, 0.5f, 0.25f, 0.5f);
-        }
 
         [MenuItem("Tanker Jam/Setup/Build Greybox Assets")]
         public static void BuildAll()
@@ -49,9 +42,9 @@ namespace TankerJam.EditorTools
             decalMat.SetTexture("_BaseMap", atlas);
             var mats = new PreviewMaterials { Body = previewBody, Shell = previewShell, Liquid = previewLiquid, Decals = decalMat };
 
-            var axleMesh = SaveMesh(BuildAxleMesh(palette), "Truck_Axle");
             for (int len = 2; len <= 4; len++)
-                config.TruckPrefabs[len - 2] = BuildTruckPrefab(len, palette, axleMesh, mats, layer);
+                config.TruckPrefabs[len - 2] = BuildTruckPrefab(len, palette, mats, layer);
+            AssetDatabase.DeleteAsset($"{MeshDir}/Truck_Axle.asset"); // wheels are baked into the body now
 
             EditorUtility.SetDirty(config);
             AssetDatabase.SaveAssets();
@@ -63,7 +56,7 @@ namespace TankerJam.EditorTools
 
         // ---------------- trucks ----------------
 
-        static TruckRig BuildTruckPrefab(int len, Palette pal, Mesh axleMesh, PreviewMaterials mats, int layer)
+        static TruckRig BuildTruckPrefab(int len, Palette pal, PreviewMaterials mats, int layer)
         {
             float lw = len - 0.12f;
             float z0 = -lw / 2f + 0.06f, z1 = lw / 2f - 0.78f, tl = z1 - z0, tc = (z0 + z1) / 2f;
@@ -82,6 +75,13 @@ namespace TankerJam.EditorTools
             k.Box(new Vector3(0, ty + r + 0.03f, tc), new Vector3(0.26f, 0.08f, 0.26f), MeshKit.Fixed(pal.Metal));
             // Saddle under the tank so it doesn't float over the chassis.
             k.Box(new Vector3(0, 0.36f, tc), new Vector3(0.5f, 0.14f, tl * 0.8f), MeshKit.Fixed(pal.Chassis));
+            // Wheels are part of the body mesh: one draw call (and one shadow draw) per truck instead of 3-5.
+            // They don't spin; at this camera distance the spin was imperceptible. Final-art prefabs may still
+            // provide separate TruckRig.Axles, which TruckView spins.
+            var axleZ = new List<float> { lw / 2f - 0.38f, -lw / 2f + 0.3f };
+            if (len >= 3) axleZ.Add(-lw / 2f + 0.72f);
+            if (len >= 4) axleZ.Add(-lw / 2f + 1.14f);
+            foreach (float z in axleZ) AddAxle(k, new Vector3(0, 0.17f, z), pal);
             var bodyMesh = SaveMesh(k.ToMesh($"Truck{len}_Body"), $"Truck{len}_Body");
 
             k.Clear();
@@ -94,8 +94,8 @@ namespace TankerJam.EditorTools
 
             k.Clear();
             float arrowLen = Mathf.Min(1.5f, tl * 0.85f);
-            k.Quad(Matrix4x4.Translate(new Vector3(0, ty + r + 0.085f, tc)), 0.48f, arrowLen, MeshKit.Tint, ArrowUV);
-            k.Quad(Matrix4x4.Translate(new Vector3(0, 0.985f, lw / 2f - 0.37f)), 0.36f, 0.36f, MeshKit.Tint, BadgeUV(TankerJam.Core.TruckDef.CapacityFor(len)));
+            k.Quad(Matrix4x4.Translate(new Vector3(0, ty + r + 0.085f, tc)), 0.48f, arrowLen, MeshKit.Tint, DecalAtlasLayout.Arrow);
+            k.Quad(Matrix4x4.Translate(new Vector3(0, 0.985f, lw / 2f - 0.37f)), 0.36f, 0.36f, MeshKit.Tint, DecalAtlasLayout.Badge(TankerJam.Core.TruckDef.CapacityFor(len)));
             var decalMesh = SaveMesh(k.ToMesh($"Truck{len}_Decals"), $"Truck{len}_Decals");
 
             // Hierarchy.
@@ -117,20 +117,9 @@ namespace TankerJam.EditorTools
             var decals = Child(body, "Decals", Vector3.zero);
             var decalR = AddRenderer(decals, decalMesh, mats.Decals, ShadowCastingMode.Off);
 
-            var axleZ = new List<float> { lw / 2f - 0.38f, -lw / 2f + 0.3f };
-            if (len >= 3) axleZ.Add(-lw / 2f + 0.72f);
-            if (len >= 4) axleZ.Add(-lw / 2f + 1.14f);
-            var axles = new Transform[axleZ.Count];
-            for (int i = 0; i < axleZ.Count; i++)
-            {
-                var axle = Child(root, $"Axle{i}", new Vector3(0, 0.17f, axleZ[i]));
-                AddRenderer(axle, axleMesh, mats.Body, ShadowCastingMode.On);
-                axles[i] = axle.transform;
-            }
-
             rig.Length = len;
             rig.Body = body.transform;
-            rig.Axles = axles;
+            rig.Axles = new Transform[0];
             rig.BodyRenderer = bodyR;
             rig.ShellRenderer = shellR;
             rig.LiquidRenderer = liquidR;
@@ -151,26 +140,23 @@ namespace TankerJam.EditorTools
             return prefab.GetComponent<TruckRig>();
         }
 
-        static Mesh BuildAxleMesh(Palette pal)
+        static void AddAxle(MeshKit k, Vector3 at, Palette pal)
         {
-            var k = new MeshKit();
             var acrossX = Quaternion.Euler(0f, 0f, 90f);
             foreach (int s in new[] { -1, 1 })
             {
-                k.Cylinder(Matrix4x4.TRS(new Vector3(s * 0.36f, 0, 0), acrossX, Vector3.one), 0.17f, 0.17f, 0.14f, 18, MeshKit.Fixed(pal.Tire));
-                k.Cylinder(Matrix4x4.TRS(new Vector3(s * 0.36f, 0, 0), acrossX, Vector3.one), 0.08f, 0.08f, 0.15f, 10, MeshKit.Fixed(pal.Hub));
-                // Hub bolts so the spin reads.
-                k.Box(Matrix4x4.TRS(new Vector3(s * 0.437f, 0.045f, 0), Quaternion.identity, Vector3.one), new Vector3(0.01f, 0.03f, 0.03f), MeshKit.Fixed(pal.Tire));
+                var c = at + new Vector3(s * 0.36f, 0, 0);
+                k.Cylinder(Matrix4x4.TRS(c, acrossX, Vector3.one), 0.17f, 0.17f, 0.14f, 16, MeshKit.Fixed(pal.Tire));
+                k.Cylinder(Matrix4x4.TRS(c, acrossX, Vector3.one), 0.08f, 0.08f, 0.15f, 10, MeshKit.Fixed(pal.Hub));
             }
-            k.Cylinder(Matrix4x4.TRS(Vector3.zero, acrossX, Vector3.one), 0.035f, 0.035f, 0.6f, 8, MeshKit.Fixed(pal.Chassis), false, false);
-            return k.ToMesh("Truck_Axle");
+            k.Cylinder(Matrix4x4.TRS(at, acrossX, Vector3.one), 0.035f, 0.035f, 0.6f, 8, MeshKit.Fixed(pal.Chassis), false, false);
         }
 
         // ---------------- decal atlas ----------------
 
         static Texture2D BakeDecalAtlas()
         {
-            const int w = 512, h = 256, ss = 3; // 3x3 supersampling
+            const int w = DecalAtlasLayout.Width, h = DecalAtlasLayout.Height, ss = 3; // 3x3 supersampling
             var tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
             var px = new Color32[w * h];
             var ink = new Color(0.118f, 0.141f, 0.2f, 1f); // #1E2433
@@ -206,7 +192,7 @@ namespace TankerJam.EditorTools
         static Color SampleAtlas(float u, float v, Color ink)
         {
             if (u < 0.25f) return Arrow(u / 0.25f, v) ? Color.white : Color.clear;
-            if (v < 0.5f) return Color.clear;
+            if (v < 0.5f) return VipText((u - 0.25f) / 0.75f * 384f, v / 0.5f * 128f) ? Color.white : Color.clear;
             int slot = (int)((u - 0.25f) / 0.25f);
             if (slot > 2) return Color.clear;
             float cu = (u - 0.25f - slot * 0.25f) / 0.25f, cv = (v - 0.5f) / 0.5f;
@@ -214,6 +200,31 @@ namespace TankerJam.EditorTools
             float dx = cu - 0.5f, dy = cv - 0.5f;
             if (dx * dx + dy * dy > 0.44f * 0.44f) return Color.clear;
             return Digit(digit, cu, cv) ? ink : Color.white;
+        }
+
+        /// <summary>"VIP" in thick rounded strokes, in pixel space of a 384 x 128 cell (y up).</summary>
+        static bool VipText(float x, float y)
+        {
+            const float r = 11f, top = 108f, bottom = 20f, mid = 66f;
+            // V
+            if (Seg(x, y, 40, top, 78, bottom) < r || Seg(x, y, 116, top, 78, bottom) < r) return true;
+            // I
+            if (Seg(x, y, 176, top, 176, bottom) < r) return true;
+            // P: stem + bowl
+            if (Seg(x, y, 232, top, 232, bottom) < r) return true;
+            if (Seg(x, y, 232, top, 300, top) < r || Seg(x, y, 232, mid, 300, mid) < r) return true;
+            float cx = 300f, cy = (top + mid) / 2f, rad = (top - mid) / 2f;
+            float d = Mathf.Abs(Mathf.Sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) - rad);
+            return x >= cx && d < r;
+        }
+
+        /// <summary>Distance from (px, py) to the segment (ax, ay)-(bx, by).</summary>
+        static float Seg(float px, float py, float ax, float ay, float bx, float by)
+        {
+            float vx = bx - ax, vy = by - ay;
+            float t = Mathf.Clamp01(((px - ax) * vx + (py - ay) * vy) / (vx * vx + vy * vy));
+            float dx = px - (ax + vx * t), dy = py - (ay + vy * t);
+            return Mathf.Sqrt(dx * dx + dy * dy);
         }
 
         /// <summary>Arrow pointing toward +v (truck forward). u across, v along.</summary>
@@ -259,6 +270,7 @@ namespace TankerJam.EditorTools
             config.ToyTransparent = AssetDatabase.LoadAssetAtPath<Shader>($"{ShaderDir}/ToyTransparent.shader");
             config.LiquidFill = AssetDatabase.LoadAssetAtPath<Shader>($"{ShaderDir}/LiquidFill.shader");
             config.Decal = AssetDatabase.LoadAssetAtPath<Shader>($"{ShaderDir}/Decal.shader");
+            config.VesselLiquid = AssetDatabase.LoadAssetAtPath<Shader>($"{ShaderDir}/VesselLiquid.shader");
             config.TruckLayer = TruckLayer;
             if (config.TruckPrefabs == null || config.TruckPrefabs.Length != 3) config.TruckPrefabs = new TruckRig[3];
             EditorUtility.SetDirty(config);

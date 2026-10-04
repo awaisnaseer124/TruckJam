@@ -17,6 +17,21 @@ namespace TankerJam.Game
 
         public static Mesh Box => box ? box : box = Build(k => k.Box(Vector3.zero, Vector3.one, MeshKit.Tint), "Box");
 
+        static Mesh sphere;
+
+        /// <summary>Low-poly unit-diameter sphere (flow blobs).</summary>
+        public static Mesh Sphere => sphere ? sphere : sphere = Build(k =>
+        {
+            var profile = new System.Collections.Generic.List<Vector2>();
+            const int rings = 6;
+            for (int i = 0; i <= rings; i++)
+            {
+                float a = -Mathf.PI / 2f + Mathf.PI * i / rings;
+                profile.Add(new Vector2(Mathf.Max(0.001f, Mathf.Cos(a) * 0.5f), Mathf.Sin(a) * 0.5f));
+            }
+            k.Lathe(Matrix4x4.identity, profile, 10, MeshKit.Tint);
+        }, "Sphere");
+
         /// <summary>Pump hand wheel: yellow torus with three spokes, in the local YZ plane (spins around X).</summary>
         public static Mesh PumpWheel(Palette pal)
         {

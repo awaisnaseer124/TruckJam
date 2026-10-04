@@ -1,6 +1,7 @@
 // Owns one level at a time: builds the board from the level data, turns taps into GameSession commands,
 // and runs the single update loop that plays out the decided results (pump -> vessels -> trucks -> hoses),
-// then checks for win/jam once everything has been calm for a moment.
+// then checks for win/jam once everything has been calm for a moment. Presentation listeners (audio,
+// particles, haptics) subscribe to Cue and never touch game state.
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,17 +28,23 @@ namespace TankerJam.Game
         public event Action<EndState> LevelEnded;
         /// <summary>Booster counts, VIP armed state or bay state changed.</summary>
         public event Action BoostersChanged;
+        /// <summary>Presentation moments (sounds, particles, haptics). See <see cref="GameCue"/>.</summary>
+        public event Action<GameCue, float> Cue;
 
         public GameSession Session { get; private set; }
         public LevelDef Level { get; private set; }
         public EndState EndState { get; private set; }
         public string Status { get; private set; } = "";
         public GameConfig Config => config;
+        public BoardLayout Layout => layout;
+        /// <summary>True while the pump is pouring a unit (drives the pour hiss).</summary>
+        public bool IsPouring => unitActive;
 
         BoardLayout layout;
         RouteBuilder routes;
         MaterialLibrary mats;
         SceneryBuilder scenery;
+        FlowFx flow;
         TapInput input;
         Transform boardRoot, truckRoot;
         PumpView pump;
@@ -52,8 +59,9 @@ namespace TankerJam.Game
         int levelVip, levelExtra;
         int pumpCursor;
         bool unitActive;
-        float unitProgress;
+        float unitProgress, glugTimer, blobTimer;
         float time, calm;
+        int bottomSignature = -1;
 
         // ---------------- lifecycle ----------------
 
@@ -80,6 +88,7 @@ namespace TankerJam.Game
             TweenSetup.Init();
             mats = new MaterialLibrary(config);
             scenery = new SceneryBuilder();
+            flow = new FlowFx(mats, config.Palette);
             input = new TapInput(config.TruckLayer);
             boardRoot = new GameObject("Board").transform;
             boardRoot.SetParent(transform, false);
@@ -114,13 +123,15 @@ namespace TankerJam.Game
             EndState = EndState.Playing;
             pumpCursor = 0;
             unitActive = false;
-            time = calm = 0f;
+            time = calm = glugTimer = blobTimer = 0f;
+            bottomSignature = -1;
 
             scenery.Build(boardRoot, level, layout, config.Palette, mats);
             BuildVessels();
             BuildHoses();
             bayRow.Rebuild(Session.Bays, layout, config.Palette);
             pump.Place(new Vector3(layout.Pump.X, 0f, layout.Pump.Z));
+            flow.Build(layout);
             SpawnTrucks();
             if (cameraFitter != null) cameraFitter.Fit(layout, config.Layout);
 
@@ -140,12 +151,12 @@ namespace TankerJam.Game
         void BuildVessels()
         {
             var p = layout.P;
-            while (vessels.Count < Level.Vessels.Count) vessels.Add(new VesselView(boardRoot, $"Vessel{vessels.Count}"));
+            while (vessels.Count < Level.Vessels.Count) vessels.Add(new VesselView(boardRoot, $"Vessel{vessels.Count}", mats.VesselLiquid));
             for (int i = 0; i < vessels.Count; i++)
             {
                 if (i >= Level.Vessels.Count) { vessels[i].Clear(); continue; }
                 vessels[i].Setup(new Vector3(layout.VesselX(i), 0f, p.VesselZ), Level.Vessels[i],
-                                 p.VesselRadius, p.VesselUnitHeight, p.VesselBaseY, mats);
+                                 p.VesselRadius, p.VesselUnitHeight, p.VesselBaseY, config.Palette);
             }
         }
 
@@ -197,15 +208,18 @@ namespace TankerJam.Game
                 case TapOutcome.Blocked:
                     t.Bump(r.FreeCells, tuning.BumpExtra);
                     SetStatus("Blocked. Something is in its way.");
+                    Raise(GameCue.Bonk);
                     break;
                 case TapOutcome.NoFreeBay:
                     t.Bump(0, tuning.NoBayBump);
                     SetStatus("All bays are busy. Wait for a truck to fill up, or use a booster.");
+                    Raise(GameCue.Bonk);
                     break;
                 case TapOutcome.Assigned:
                     RegisterUnits(r);
                     t.DriveTo(r.Bay, routes, layout.ParkZ(t.Rig.TankCenterZ));
                     SetStatus("");
+                    Raise(GameCue.Depart);
                     break;
                 case TapOutcome.VipLifted:
                     RegisterUnits(r);
@@ -213,6 +227,7 @@ namespace TankerJam.Game
                     bayRow.Sync(Session.Bays, layout, config.Palette);
                     SetStatus("VIP lift! The truck goes straight to the VIP bay.");
                     BoostersChanged?.Invoke();
+                    Raise(GameCue.VipLift, tuning.VipDuration);
                     break;
             }
         }
@@ -246,6 +261,7 @@ namespace TankerJam.Game
             Resume();
             SetStatus("Extra bay open.");
             BoostersChanged?.Invoke();
+            Raise(GameCue.ExtraBayOpened);
             return true;
         }
 
@@ -262,6 +278,8 @@ namespace TankerJam.Game
                 trucks[Session.Units[i].TruckId].PendingUnits++;
         }
 
+        void Raise(GameCue cue, float arg = 0f) => Cue?.Invoke(cue, arg);
+
         // ---------------- loop ----------------
 
         void Update()
@@ -274,6 +292,14 @@ namespace TankerJam.Game
             }
 
             Advance(Time.deltaTime);
+        }
+
+        void LateUpdate() => SubmitFx();
+
+        /// <summary>Submits instanced effects (flow blobs) for this frame. Called from LateUpdate.</summary>
+        public void SubmitFx()
+        {
+            if (Session != null) flow.Render();
         }
 
         /// <summary>
@@ -308,6 +334,14 @@ namespace TankerJam.Game
             {
                 var t = trucks[i];
                 var ev = t.Tick(dt, time, routes);
+                if (ev == TruckEvents.None) continue;
+                if ((ev & TruckEvents.Parked) != 0) Raise(GameCue.Brake);
+                if ((ev & TruckEvents.BecameFull) != 0)
+                {
+                    t.PunchFull();
+                    Raise(GameCue.TruckFull);
+                }
+                if ((ev & TruckEvents.StartedLeaving) != 0) Raise(GameCue.Leave);
                 if ((ev & TruckEvents.ClearedBay) != 0)
                 {
                     Session.ReleaseBay(t.Bay);
@@ -317,6 +351,7 @@ namespace TankerJam.Game
             }
 
             TickHoses(dt);
+            flow.Tick(dt);
             pump.Tick(dt, time, unitActive);
         }
 
@@ -344,6 +379,19 @@ namespace TankerJam.Game
             t.AddFill(amt);
             t.Receiving = true;
             vessel.DrainBottom(amt);
+
+            glugTimer -= dt;
+            if (glugTimer <= 0f)
+            {
+                glugTimer = 0.1f + UnityEngine.Random.value * 0.06f;
+                Raise(GameCue.Glug, t.Fill / t.Capacity);
+            }
+            blobTimer -= dt;
+            if (blobTimer <= 0f)
+            {
+                blobTimer = 0.055f;
+                flow.Spawn(u.Vessel, t.Bay, u.Color);
+            }
 
             if (unitProgress >= 1f - 1e-4f)
             {
@@ -394,8 +442,9 @@ namespace TankerJam.Game
                 var next = trucks[units[pumpCursor].TruckId].State;
                 if (next != TruckState.Filling && next != TruckState.Gone) return true;
             }
-            foreach (var t in trucks)
+            for (int i = 0; i < trucks.Count; i++)
             {
+                var t = trucks[i];
                 if (t.IsBumping) return true;
                 switch (t.State)
                 {
@@ -420,8 +469,14 @@ namespace TankerJam.Game
             var state = Session.Evaluate();
             if (state == EndState.Playing)
             {
+                // Rebuild the hint only when the bottom colors change (no per-frame string allocations).
                 Session.Rules.BottomColors(bottomColors);
-                if (bottomColors.Count > 0) SetStatus("Ready to flow: " + BottomColorNames() + ".");
+                int signature = BottomSignature();
+                if (signature != bottomSignature && bottomColors.Count > 0)
+                {
+                    SetStatus("Ready to flow: " + BottomColorNames() + ".");
+                    bottomSignature = signature;
+                }
                 return;
             }
             EndState = state;
@@ -438,7 +493,15 @@ namespace TankerJam.Game
                     SetStatus("Jammed: no truck in the lot has a clear road out.");
                     break;
             }
+            Raise(state == EndState.Won ? GameCue.Win : GameCue.Jam);
             LevelEnded?.Invoke(state);
+        }
+
+        int BottomSignature()
+        {
+            int h = 17;
+            for (int i = 0; i < bottomColors.Count; i++) h = h * 31 + bottomColors[i];
+            return h;
         }
 
         string BottomColorNames()
@@ -454,6 +517,7 @@ namespace TankerJam.Game
 
         void SetStatus(string message)
         {
+            bottomSignature = -1; // any other message lets the next calm moment show the hint again
             if (message == Status) return;
             Status = message;
             StatusChanged?.Invoke(message);
@@ -464,5 +528,7 @@ namespace TankerJam.Game
         public bool IsBusy => Session != null && AnythingMoving();
         public TruckView Truck(int id) => trucks[id];
         public int TruckCount => trucks.Count;
+        public int ActiveBlobCount => flow.Count;
+        public int BlobDrawCalls => flow.BatchCount;
     }
 }
