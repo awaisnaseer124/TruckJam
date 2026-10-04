@@ -1,0 +1,8 @@
+{
+    "name": "DOTween.Modules",
+    "rootNamespace": "",
+    "references": [
+        "UnityEngine.UI"
+    ],
+    "autoReferenced": true
+}

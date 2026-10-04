@@ -77,6 +77,7 @@ namespace TankerJam.Game
                 enabled = false;
                 return;
             }
+            TweenSetup.Init();
             mats = new MaterialLibrary(config);
             scenery = new SceneryBuilder();
             input = new TapInput(config.TruckLayer);
