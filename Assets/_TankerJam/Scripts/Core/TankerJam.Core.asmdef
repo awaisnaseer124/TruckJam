@@ -1,0 +1,6 @@
+{
+    "name": "TankerJam.Core",
+    "rootNamespace": "TankerJam.Core",
+    "references": [],
+    "noEngineReferences": true
+}
