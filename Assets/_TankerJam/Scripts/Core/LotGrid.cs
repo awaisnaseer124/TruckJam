@@ -1,16 +1,9 @@
-// Cell occupancy for the parking lot: O(1) lookups for exit checks.
+// Cell occupancy for a grid lot: O(1) lookups for exit checks. The original rules model; kept as the
+// reference oracle that the geometric lot (FreeLot) is tested against.
 
 namespace TankerJam.Core
 {
-    public readonly struct ExitResult
-    {
-        public readonly bool Clear;
-        /// <summary>Free cells in front of the truck before the first obstacle (for the bump animation).</summary>
-        public readonly int FreeCells;
-        public ExitResult(bool clear, int free) { Clear = clear; FreeCells = free; }
-    }
-
-    public sealed class LotGrid
+    public sealed class LotGrid : ILot
     {
         public const int Empty = -1;
         public const int Cone = -2;

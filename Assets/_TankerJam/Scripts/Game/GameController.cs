@@ -220,7 +220,7 @@ namespace TankerJam.Game
             switch (r.Outcome)
             {
                 case TapOutcome.Blocked:
-                    t.Bump(r.FreeCells, tuning.BumpExtra);
+                    t.Bump(r.FreeDistance, tuning.BumpExtra);
                     SetStatus("Blocked. Something is in its way.");
                     Raise(GameCue.Bonk);
                     break;

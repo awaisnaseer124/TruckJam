@@ -24,7 +24,7 @@ namespace TankerJam.Core
     {
         /// <summary>Truck can't be tapped now (already left the lot).</summary>
         Ignored,
-        /// <summary>Path out of the lot is blocked. <see cref="TapResult.FreeCells"/> is the lurch distance.</summary>
+        /// <summary>Path out of the lot is blocked. <see cref="TapResult.FreeDistance"/> is the lurch distance.</summary>
         Blocked,
         /// <summary>Path is clear but every open bay is occupied.</summary>
         NoFreeBay,
@@ -37,13 +37,16 @@ namespace TankerJam.Core
     public readonly struct TapResult
     {
         public readonly TapOutcome Outcome;
-        public readonly int TruckId, Bay, FreeCells;
+        public readonly int TruckId, Bay;
+        /// <summary>How far the truck can move before touching what blocks it (board units).</summary>
+        public readonly float FreeDistance;
+        public int FreeCells => (int)(FreeDistance + 1e-3f);
         /// <summary>Range of new units in <see cref="GameSession.Units"/> created by this tap.</summary>
         public readonly int FirstUnit, UnitCount;
 
-        public TapResult(TapOutcome outcome, int truckId, int bay = -1, int freeCells = 0, int firstUnit = 0, int unitCount = 0)
+        public TapResult(TapOutcome outcome, int truckId, int bay = -1, float freeDistance = 0f, int firstUnit = 0, int unitCount = 0)
         {
-            Outcome = outcome; TruckId = truckId; Bay = bay; FreeCells = freeCells; FirstUnit = firstUnit; UnitCount = unitCount;
+            Outcome = outcome; TruckId = truckId; Bay = bay; FreeDistance = freeDistance; FirstUnit = firstUnit; UnitCount = unitCount;
         }
     }
 
@@ -96,7 +99,7 @@ namespace TankerJam.Core
             }
 
             var exit = Rules.CheckExit(truckId);
-            if (!exit.Clear) return new TapResult(TapOutcome.Blocked, truckId, freeCells: exit.FreeCells);
+            if (!exit.Clear) return new TapResult(TapOutcome.Blocked, truckId, freeDistance: exit.FreeDistance);
 
             var bay = FirstFreeBay();
             if (bay == null) return new TapResult(TapOutcome.NoFreeBay, truckId);
@@ -108,7 +111,7 @@ namespace TankerJam.Core
             bay.TruckId = truckId;
             int first = Units.Count;
             Rules.Assign(truckId, Units);
-            return new TapResult(outcome, truckId, bay.Index, 0, first, Units.Count - first);
+            return new TapResult(outcome, truckId, bay.Index, 0f, first, Units.Count - first);
         }
 
         /// <summary>First open, empty regular or extra bay, left to right. The VIP bay only takes VIP lifts.</summary>

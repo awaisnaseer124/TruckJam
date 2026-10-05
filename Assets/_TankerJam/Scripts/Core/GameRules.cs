@@ -25,7 +25,7 @@ namespace TankerJam.Core
     public sealed class GameRules
     {
         public readonly LevelDef Level;
-        readonly LotGrid grid;
+        readonly ILot lot;
         readonly bool[] inLot;
         int trucksInLot;
 
@@ -34,10 +34,13 @@ namespace TankerJam.Core
         /// <summary>Vessel contents, bottom layer first.</summary>
         public readonly List<List<char>> Vessels = new List<List<char>>();
 
-        public GameRules(LevelDef level)
+        /// <param name="model">Geometric (default) handles any truck angle; Grid is the original cell model,
+        /// kept as the oracle the geometric model is tested against (grid levels only).</param>
+        public GameRules(LevelDef level, LotModel model = LotModel.Geometric)
         {
             Level = level;
-            grid = new LotGrid(level);
+            if (model == LotModel.Grid && !level.IsGrid) throw new ArgumentException("The grid model only supports grid (version 1) levels.");
+            lot = model == LotModel.Grid ? (ILot)new LotGrid(level) : new FreeLot(level);
             inLot = new bool[level.Trucks.Count];
             for (int i = 0; i < inLot.Length; i++)
             {
@@ -51,14 +54,12 @@ namespace TankerJam.Core
         public bool InLot(int truckId) => inLot[truckId];
         public int TrucksInLot => trucksInLot;
         public TruckDef Truck(int id) => Level.Trucks[id];
-        public LotGrid Grid => grid;
-
-        public ExitResult CheckExit(int truckId) => grid.CheckExit(truckId);
+        public ExitResult CheckExit(int truckId) => lot.CheckExit(truckId);
 
         public bool AnyTruckCanExit()
         {
             for (int id = 0; id < inLot.Length; id++)
-                if (inLot[id] && grid.CheckExit(id).Clear) return true;
+                if (inLot[id] && lot.CheckExit(id).Clear) return true;
             return false;
         }
 
@@ -80,7 +81,7 @@ namespace TankerJam.Core
             if (!inLot[truckId]) throw new InvalidOperationException($"Truck {truckId} is not in the lot.");
             inLot[truckId] = false;
             trucksInLot--;
-            grid.Remove(truckId);
+            lot.Remove(truckId);
             var t = Level.Trucks[truckId];
             Slots.Add(new Slot { TruckId = truckId, Color = t.Color, Cap = t.Capacity });
             Settle(unitsOut);

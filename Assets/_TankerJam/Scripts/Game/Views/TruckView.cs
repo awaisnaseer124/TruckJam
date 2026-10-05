@@ -123,12 +123,12 @@ namespace TankerJam.Game
 
         // ---------------- commands ----------------
 
-        /// <summary>Blocked or no bay: lurch forward by the free distance, then bounce back.</summary>
-        public void Bump(int freeCells, float extra)
+        /// <summary>Blocked or no bay: lurch forward by the free distance (board units), then bounce back.</summary>
+        public void Bump(float freeDistance, float extra)
         {
             bumpActive = true;
             bumpT = 0f;
-            bumpDist = freeCells + extra;
+            bumpDist = freeDistance + extra;
             var d = BoardLayout.Dir(Def.Facing);
             bumpDir = new Vector3(d.X, 0f, d.Z);
         }
