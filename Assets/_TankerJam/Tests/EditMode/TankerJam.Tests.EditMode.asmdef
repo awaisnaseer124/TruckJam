@@ -1,9 +1,20 @@
 {
     "name": "TankerJam.Tests.EditMode",
-    "references": ["TankerJam.Core", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
-    "includePlatforms": ["Editor"],
+    "references": [
+        "TankerJam.Core",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "TankerJam.Meta"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "overrideReferences": true,
-    "precompiledReferences": ["nunit.framework.dll"],
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
     "autoReferenced": false,
-    "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ]
 }

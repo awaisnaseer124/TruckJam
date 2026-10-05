@@ -9,6 +9,7 @@ namespace TankerJam.Game
     public sealed class SolutionPlayer
     {
         int index;
+        LevelDef level;
 
         public int Step => index;
         public bool Done(GameController game) => index >= game.Level.Solution.Count;
@@ -19,6 +20,7 @@ namespace TankerJam.Game
         public bool Tick(GameController game)
         {
             if (game.Session == null || game.EndState != EndState.Playing) return false;
+            if (game.Level != level) { level = game.Level; index = 0; } // a new level (or a retry) started
             var sol = game.Level.Solution;
             while (index < sol.Count && !game.Session.InLot(sol[index])) index++;
             if (index >= sol.Count) return false;

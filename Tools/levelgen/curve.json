@@ -1,0 +1,14 @@
+{
+  "_comment": "Difficulty curve from the implementation guide. Each tier covers a level range; build_curve.py turns it into one generator job per level. Every 'hardEvery'-th level is Hard (low end of the rate band) and the next one is easy (high end).",
+  "hardEvery": 5,
+  "size": 7,
+  "introduces": { "6": "vip", "10": "extra" },
+  "tiers": [
+    { "from": 1,  "to": 3,  "slots": [4],    "colors": [2],    "trucks": [5, 6],   "lens": [2],             "vessels": 3, "cones": 0, "rate": [0.80, 1.00] },
+    { "from": 4,  "to": 8,  "slots": [4],    "colors": [3],    "trucks": [7, 8],   "lens": [2, 2, 3],       "vessels": 4, "cones": 1, "rate": [0.55, 0.80] },
+    { "from": 9,  "to": 15, "slots": [3],    "colors": [3],    "trucks": [8, 10],  "lens": [2, 2, 3, 3, 4], "vessels": 4, "cones": 2, "rate": [0.35, 0.60] },
+    { "from": 16, "to": 25, "slots": [3],    "colors": [4],    "trucks": [10, 11], "lens": [2, 2, 3, 3, 4], "vessels": 4, "cones": 2, "rate": [0.20, 0.40] },
+    { "from": 26, "to": 40, "slots": [3],    "colors": [4],    "trucks": [11, 12], "lens": [2, 2, 3, 3, 4], "vessels": 4, "cones": 2, "rate": [0.10, 0.30] },
+    { "from": 41, "to": 50, "slots": [2, 3], "colors": [4, 5], "trucks": [12, 14], "lens": [2, 3, 3, 4],    "vessels": 4, "cones": 2, "rate": [0.05, 0.20] }
+  ]
+}

@@ -1,8 +1,20 @@
 {
     "name": "TankerJam.Tests.PlayMode",
-    "references": ["TankerJam.Core", "TankerJam.Game", "UnityEngine.TestRunner"],
+    "references": [
+        "TankerJam.Core",
+        "TankerJam.Game",
+        "UnityEngine.TestRunner",
+        "TankerJam.Meta",
+        "TankerJam.UI",
+        "TankerJam.App",
+        "UnityEngine.UI"
+    ],
     "overrideReferences": true,
-    "precompiledReferences": ["nunit.framework.dll"],
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
     "autoReferenced": false,
-    "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ]
 }

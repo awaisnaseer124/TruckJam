@@ -17,13 +17,20 @@ namespace TankerJam.Tests
         const float Dt = 1f / 60f;
         GameController game;
 
+        [TearDown]
+        public void ClearPersistence() => TankerJam.App.AppRoot.PersistenceOverride = null;
+
         [UnitySetUp]
         public IEnumerator LoadScene()
         {
+            TankerJam.App.AppRoot.PersistenceOverride = new TankerJam.Meta.MemoryPersistence(); // never touch the real save
             SceneManager.LoadScene("Game");
             yield return null;
             yield return null;
             game = Object.FindFirstObjectByType<GameController>();
+            // Tests use the prototype's reference level (fixed truck ids), whatever level the app starts on.
+            string path = System.IO.Path.Combine(Application.dataPath, "_TankerJam/Tests/EditMode/Fixtures/reference_level.json");
+            game.Load(LevelJson.Parse(System.IO.File.ReadAllText(path)), 1, 1);
             var hud = Object.FindFirstObjectByType<DebugHud>();
             if (hud != null) hud.AutoSolve = false;
         }

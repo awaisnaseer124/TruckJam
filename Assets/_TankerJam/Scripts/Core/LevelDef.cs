@@ -64,6 +64,15 @@ namespace TankerJam.Core
         /// <summary>Share of random games that win (solver metadata, 0..1). Negative when unknown.</summary>
         public float RandomWinRate = -1f;
 
+        // Curve metadata written by Tools/levelgen/build_curve.py ("meta" block). Optional.
+        /// <summary>1-based position in the level curve, or 0 when unknown.</summary>
+        public int Index;
+        public int Tier;
+        /// <summary>Marked Hard in the sawtooth (double coins, "Hard" badge).</summary>
+        public bool Hard;
+        /// <summary>Feature introduced on this level ("vip", "extra"), or null.</summary>
+        public string Introduces;
+
         public int MaxVesselHeight
         {
             get

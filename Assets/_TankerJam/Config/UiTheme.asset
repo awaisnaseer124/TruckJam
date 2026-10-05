@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 834b871392913134e9bca6dc00c2a2cd, type: 3}
+  m_Name: UiTheme
+  m_EditorClassIdentifier: TankerJam.UI::TankerJam.UI.UiTheme
+  Accent: {r: 0.18039216, g: 0.65882355, b: 1, a: 1}
+  AccentShadow: {r: 0.10980392, g: 0.49803922, b: 0.76862746, a: 1}
+  Gold: {r: 1, g: 0.69803923, b: 0.101960786, a: 1}
+  GoldShadow: {r: 0.7882353, g: 0.52156866, b: 0, a: 1}
+  GoldInk: {r: 0.22745098, g: 0.14117648, b: 0, a: 1}
+  Badge: {r: 1, g: 0.23921569, b: 0.43137255, a: 1}
+  Panel: {r: 1, g: 1, b: 1, a: 1}
+  Ink: {r: 0.11764706, g: 0.14117648, b: 0.2, a: 1}
+  Muted: {r: 0.3647059, g: 0.40784314, b: 0.5019608, a: 1}
+  Line: {r: 0.7882353, g: 0.8392157, b: 0.8901961, a: 1}
+  Sky: {r: 0.8509804, g: 0.90588236, b: 0.9490196, a: 1}
+  Dim: {r: 0.06, g: 0.08, b: 0.14, a: 0.5}
+  StarOn: {r: 1, g: 0.7607843, b: 0.12156863, a: 1}
+  StarOff: {r: 0.8352941, g: 0.87058824, b: 0.9098039, a: 1}
+  TitleFont: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  BodyFont: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  Rounded: {fileID: 21300000, guid: b57667b0eeb4f4f4995742dc2b358e47, type: 3}
+  Circle: {fileID: 21300000, guid: 966feda05567a8741a42de269f6ac22e, type: 3}
+  Ring: {fileID: 21300000, guid: 3fb4d4beead50d74dbf733b96a4dd5db, type: 3}
+  IconRetry: {fileID: 21300000, guid: 71388a584f8c66f47b8fb78925b20d70, type: 3}
+  IconSoundOn: {fileID: 21300000, guid: 78199f367b3f5134a9fe43aeaac887dd, type: 3}
+  IconSoundOff: {fileID: 21300000, guid: 93396adb8c99514459fccbb2a3ec8bd8, type: 3}
+  IconCrown: {fileID: 21300000, guid: 43fbce8d46bc73e40adb095b4a4dc9b3, type: 3}
+  IconPlus: {fileID: 21300000, guid: d5afed229d3756049869739a802ca5ce, type: 3}
+  IconStar: {fileID: 21300000, guid: 141079328b9986747b499d5c3c2c3644, type: 3}
+  IconCoin: {fileID: 21300000, guid: 0a6a89d558ba21448853dd041e8d802c, type: 3}
+  IconHand: {fileID: 21300000, guid: 82897fe0be1eca546b6c269b789fcf36, type: 3}

@@ -1,0 +1,415 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 557a4dc3436ef6c4783716bdb997b527, type: 3}
+  m_Name: LevelCatalog
+  m_EditorClassIdentifier: TankerJam.Game::TankerJam.Game.LevelCatalog
+  Levels:
+  - Json: {fileID: 4900000, guid: 24009d1f398f47c468c5e09b4f440871, type: 3}
+    Index: 1
+    Tier: 1
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 1
+    Trucks: 5
+    Par: 5
+  - Json: {fileID: 4900000, guid: 83d2bd58b285ea044aa16d8d1a2a59b5, type: 3}
+    Index: 2
+    Tier: 1
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 1
+    Trucks: 6
+    Par: 6
+  - Json: {fileID: 4900000, guid: 91ca40dae24297f47999a2c2a12466eb, type: 3}
+    Index: 3
+    Tier: 1
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 1
+    Trucks: 6
+    Par: 6
+  - Json: {fileID: 4900000, guid: f54b9f74df5da4a40b048b42efb9a5a9, type: 3}
+    Index: 4
+    Tier: 2
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.79
+    Trucks: 7
+    Par: 7
+  - Json: {fileID: 4900000, guid: 2e33e1f92a7d9204ab1a9395f5153d86, type: 3}
+    Index: 5
+    Tier: 2
+    Hard: 1
+    Introduces: 
+    RandomWinRate: 0.61
+    Trucks: 7
+    Par: 7
+  - Json: {fileID: 4900000, guid: 58593ddf7755f304b84e64b5a07e55ac, type: 3}
+    Index: 6
+    Tier: 2
+    Hard: 0
+    Introduces: vip
+    RandomWinRate: 0.76666665
+    Trucks: 8
+    Par: 8
+  - Json: {fileID: 4900000, guid: 58066095ea0bf22488bcc8ef883e76ca, type: 3}
+    Index: 7
+    Tier: 2
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.75
+    Trucks: 8
+    Par: 8
+  - Json: {fileID: 4900000, guid: cab23ed38a8350b48821e8a5997dd8e1, type: 3}
+    Index: 8
+    Tier: 2
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.55
+    Trucks: 8
+    Par: 8
+  - Json: {fileID: 4900000, guid: 56ed6d536d48e3c4fb701c6a5aab87c6, type: 3}
+    Index: 9
+    Tier: 3
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.35333332
+    Trucks: 8
+    Par: 8
+  - Json: {fileID: 4900000, guid: 2a08b3ad81e232f4c9e625e53d02e54e, type: 3}
+    Index: 10
+    Tier: 3
+    Hard: 1
+    Introduces: extra
+    RandomWinRate: 0.35666665
+    Trucks: 8
+    Par: 8
+  - Json: {fileID: 4900000, guid: 8399162570916b246a10d5cce9e4d58b, type: 3}
+    Index: 11
+    Tier: 3
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.58666664
+    Trucks: 9
+    Par: 9
+  - Json: {fileID: 4900000, guid: 2dd54e6182a267f4d94cb564f8e881c1, type: 3}
+    Index: 12
+    Tier: 3
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.5966667
+    Trucks: 9
+    Par: 9
+  - Json: {fileID: 4900000, guid: 5cfb8845f9782e246a11db70813e499c, type: 3}
+    Index: 13
+    Tier: 3
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.37
+    Trucks: 9
+    Par: 9
+  - Json: {fileID: 4900000, guid: ba13a2dcfe8987e48a7b886480ea4a4f, type: 3}
+    Index: 14
+    Tier: 3
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.55
+    Trucks: 10
+    Par: 10
+  - Json: {fileID: 4900000, guid: e98c59b9d9f749b48992e20e8ba3978f, type: 3}
+    Index: 15
+    Tier: 3
+    Hard: 1
+    Introduces: 
+    RandomWinRate: 0.39
+    Trucks: 10
+    Par: 10
+  - Json: {fileID: 4900000, guid: 26db905ceb82d324db0f36ba53b47e65, type: 3}
+    Index: 16
+    Tier: 4
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.36333334
+    Trucks: 10
+    Par: 10
+  - Json: {fileID: 4900000, guid: b6281bbaa8e5c4d41a46e0a529b2b96a, type: 3}
+    Index: 17
+    Tier: 4
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.35666665
+    Trucks: 10
+    Par: 10
+  - Json: {fileID: 4900000, guid: 16cc8c3a28f23764983dcc7eaf3c34a4, type: 3}
+    Index: 18
+    Tier: 4
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.3
+    Trucks: 10
+    Par: 10
+  - Json: {fileID: 4900000, guid: cd76e41d69e728848a593aef5c358e32, type: 3}
+    Index: 19
+    Tier: 4
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.39666668
+    Trucks: 10
+    Par: 10
+  - Json: {fileID: 4900000, guid: 87542c6f20fa8394181cbb41cb69121d, type: 3}
+    Index: 20
+    Tier: 4
+    Hard: 1
+    Introduces: 
+    RandomWinRate: 0.20666666
+    Trucks: 10
+    Par: 10
+  - Json: {fileID: 4900000, guid: cac0f3b811292ee44beaf31d119b9f97, type: 3}
+    Index: 21
+    Tier: 4
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.34333333
+    Trucks: 11
+    Par: 11
+  - Json: {fileID: 4900000, guid: e6f420916f238c849a429ddc072f6fb5, type: 3}
+    Index: 22
+    Tier: 4
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.34
+    Trucks: 11
+    Par: 11
+  - Json: {fileID: 4900000, guid: e7a94d71f10286543b169b5de2e5310e, type: 3}
+    Index: 23
+    Tier: 4
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.21
+    Trucks: 11
+    Par: 11
+  - Json: {fileID: 4900000, guid: 82457f2e571cc0c4ba256e624a919dbb, type: 3}
+    Index: 24
+    Tier: 4
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.30333334
+    Trucks: 11
+    Par: 11
+  - Json: {fileID: 4900000, guid: 0c25e9a601de8604ea275ca9ca6d4b40, type: 3}
+    Index: 25
+    Tier: 4
+    Hard: 1
+    Introduces: 
+    RandomWinRate: 0.2
+    Trucks: 11
+    Par: 11
+  - Json: {fileID: 4900000, guid: 22dd87642f6311844bb681106f4b0cab, type: 3}
+    Index: 26
+    Tier: 5
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.25333333
+    Trucks: 11
+    Par: 11
+  - Json: {fileID: 4900000, guid: 2c7c91ea642634e4f817416c8fb95d10, type: 3}
+    Index: 27
+    Tier: 5
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.26333332
+    Trucks: 11
+    Par: 11
+  - Json: {fileID: 4900000, guid: 3d8b3730fee153f4180a238ae416e916, type: 3}
+    Index: 28
+    Tier: 5
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.24
+    Trucks: 11
+    Par: 11
+  - Json: {fileID: 4900000, guid: 908bb3e8cad545f47a07903958800829, type: 3}
+    Index: 29
+    Tier: 5
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.25666666
+    Trucks: 11
+    Par: 11
+  - Json: {fileID: 4900000, guid: 86ab18a320f3d54428e7438dc561f8dc, type: 3}
+    Index: 30
+    Tier: 5
+    Hard: 1
+    Introduces: 
+    RandomWinRate: 0.12666667
+    Trucks: 11
+    Par: 11
+  - Json: {fileID: 4900000, guid: 3e3a2a9c3bf3ed74795647588b67c9f0, type: 3}
+    Index: 31
+    Tier: 5
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.26
+    Trucks: 11
+    Par: 11
+  - Json: {fileID: 4900000, guid: df6575087a3a0284d9a340175603c5de, type: 3}
+    Index: 32
+    Tier: 5
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.24666667
+    Trucks: 11
+    Par: 11
+  - Json: {fileID: 4900000, guid: 37fe3c2dd5d28514f9b6b363f5203cce, type: 3}
+    Index: 33
+    Tier: 5
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.14
+    Trucks: 12
+    Par: 12
+  - Json: {fileID: 4900000, guid: f927022d551c6fa438743ffdefad8f3c, type: 3}
+    Index: 34
+    Tier: 5
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.18333334
+    Trucks: 12
+    Par: 12
+  - Json: {fileID: 4900000, guid: a6c6648c04d82b7448baa5caa849457f, type: 3}
+    Index: 35
+    Tier: 5
+    Hard: 1
+    Introduces: 
+    RandomWinRate: 0.12
+    Trucks: 12
+    Par: 12
+  - Json: {fileID: 4900000, guid: fdab930df2098a742b47b505e950f9d9, type: 3}
+    Index: 36
+    Tier: 5
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.27333334
+    Trucks: 12
+    Par: 12
+  - Json: {fileID: 4900000, guid: f3f15aa8198efd744a6d760f89b8bd03, type: 3}
+    Index: 37
+    Tier: 5
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.27333334
+    Trucks: 12
+    Par: 12
+  - Json: {fileID: 4900000, guid: 1963406987f69b3408f4deb1f2a61366, type: 3}
+    Index: 38
+    Tier: 5
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.13333334
+    Trucks: 12
+    Par: 12
+  - Json: {fileID: 4900000, guid: c88ebea5cb76409458786ebd1cb7a486, type: 3}
+    Index: 39
+    Tier: 5
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.28333333
+    Trucks: 12
+    Par: 12
+  - Json: {fileID: 4900000, guid: 22fda292f67ff914eaec623982d987ff, type: 3}
+    Index: 40
+    Tier: 5
+    Hard: 1
+    Introduces: 
+    RandomWinRate: 0.16
+    Trucks: 12
+    Par: 12
+  - Json: {fileID: 4900000, guid: 782837ceb9683ea45b9ffc67d5a0c526, type: 3}
+    Index: 41
+    Tier: 6
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.18666667
+    Trucks: 12
+    Par: 12
+  - Json: {fileID: 4900000, guid: 1fde317cf74364041bb7da803fa1588b, type: 3}
+    Index: 42
+    Tier: 6
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.06333333
+    Trucks: 12
+    Par: 12
+  - Json: {fileID: 4900000, guid: aa1cec94c09cc4c49ae9aca4c25304ae, type: 3}
+    Index: 43
+    Tier: 6
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.093333334
+    Trucks: 12
+    Par: 12
+  - Json: {fileID: 4900000, guid: cce45de815728e749b704f618a7fecf3, type: 3}
+    Index: 44
+    Tier: 6
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.13
+    Trucks: 13
+    Par: 13
+  - Json: {fileID: 4900000, guid: 91df98146c6b5cf45b52aecb6a11c932, type: 3}
+    Index: 45
+    Tier: 6
+    Hard: 1
+    Introduces: 
+    RandomWinRate: 0.07333333
+    Trucks: 13
+    Par: 13
+  - Json: {fileID: 4900000, guid: e07b67504640cd44ca94e8c3827559d7, type: 3}
+    Index: 46
+    Tier: 6
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.15333334
+    Trucks: 13
+    Par: 13
+  - Json: {fileID: 4900000, guid: 704e1bafbf248b7468a60f361cd8a93d, type: 3}
+    Index: 47
+    Tier: 6
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.12666667
+    Trucks: 13
+    Par: 13
+  - Json: {fileID: 4900000, guid: 576933713c023574ab35032e07f25709, type: 3}
+    Index: 48
+    Tier: 6
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.15666667
+    Trucks: 14
+    Par: 14
+  - Json: {fileID: 4900000, guid: 3f86677582134504a895621c4fc60721, type: 3}
+    Index: 49
+    Tier: 6
+    Hard: 0
+    Introduces: 
+    RandomWinRate: 0.13
+    Trucks: 14
+    Par: 14
+  - Json: {fileID: 4900000, guid: 8356d9917bf904047b36b51db8022db8, type: 3}
+    Index: 50
+    Tier: 6
+    Hard: 1
+    Introduces: 
+    RandomWinRate: 0.09
+    Trucks: 14
+    Par: 14

@@ -1,0 +1,13 @@
+{
+    "name": "TankerJam.App",
+    "rootNamespace": "TankerJam.App",
+    "references": [
+        "TankerJam.Core",
+        "TankerJam.Game",
+        "TankerJam.Meta",
+        "TankerJam.UI",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
+    ],
+    "autoReferenced": true
+}

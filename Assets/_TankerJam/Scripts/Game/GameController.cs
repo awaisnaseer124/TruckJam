@@ -10,6 +10,8 @@ using UnityEngine;
 
 namespace TankerJam.Game
 {
+    public enum Booster { Vip, ExtraBay }
+
     public sealed class GameController : MonoBehaviour
     {
         [SerializeField] GameConfig config;
@@ -19,6 +21,8 @@ namespace TankerJam.Game
 
         [Header("Standalone start (until the meta layer drives level loading)")]
         [SerializeField] TextAsset startLevel;
+        [Tooltip("Load Start Level on Start. Off when an app root drives level loading.")]
+        [SerializeField] bool autoStartLevel = true;
         [SerializeField] int startVipBoosters = 1;
         [SerializeField] int startExtraBoosters = 1;
 
@@ -30,12 +34,18 @@ namespace TankerJam.Game
         public event Action BoostersChanged;
         /// <summary>Presentation moments (sounds, particles, haptics). See <see cref="GameCue"/>.</summary>
         public event Action<GameCue, float> Cue;
+        /// <summary>A booster was actually spent (VIP lift performed, extra bay opened).</summary>
+        public event Action<Booster> BoosterUsed;
+
+        /// <summary>When false, taps on trucks are ignored (menus and popups are up).</summary>
+        public bool InputEnabled { get; set; } = true;
 
         public GameSession Session { get; private set; }
         public LevelDef Level { get; private set; }
         public EndState EndState { get; private set; }
         public string Status { get; private set; } = "";
         public GameConfig Config => config;
+        public Camera GameCamera => gameCamera;
         public BoardLayout Layout => layout;
         /// <summary>True while the pump is pouring a unit (drives the pour hiss).</summary>
         public bool IsPouring => unitActive;
@@ -67,8 +77,9 @@ namespace TankerJam.Game
 
 #if UNITY_EDITOR
         /// <summary>Scene setup tooling: wires references from code.</summary>
-        public void EditorWire(GameConfig gameConfig, Camera cam, CameraFitter fitter, LightingRig lightingRig, TextAsset level)
+        public void EditorWire(GameConfig gameConfig, Camera cam, CameraFitter fitter, LightingRig lightingRig, TextAsset level, bool autoStart = true)
         {
+            autoStartLevel = autoStart;
             config = gameConfig;
             gameCamera = cam;
             cameraFitter = fitter;
@@ -102,7 +113,7 @@ namespace TankerJam.Game
 
         void Start()
         {
-            if (startLevel != null && Level == null)
+            if (autoStartLevel && startLevel != null && Level == null)
                 Load(LevelJson.Parse(startLevel.text), startVipBoosters, startExtraBoosters);
         }
 
@@ -227,6 +238,7 @@ namespace TankerJam.Game
                     bayRow.Sync(Session.Bays, layout, config.Palette);
                     SetStatus("VIP lift! The truck goes straight to the VIP bay.");
                     BoostersChanged?.Invoke();
+                    BoosterUsed?.Invoke(Booster.Vip);
                     Raise(GameCue.VipLift, tuning.VipDuration);
                     break;
             }
@@ -261,8 +273,17 @@ namespace TankerJam.Game
             Resume();
             SetStatus("Extra bay open.");
             BoostersChanged?.Invoke();
+            BoosterUsed?.Invoke(Booster.ExtraBay);
             Raise(GameCue.ExtraBayOpened);
             return true;
+        }
+
+        /// <summary>Adds boosters to the running level (e.g. bought with coins).</summary>
+        public void AddBoosters(int vip, int extra)
+        {
+            if (Session == null) return;
+            Session.AddBoosters(vip, extra);
+            BoostersChanged?.Invoke();
         }
 
         /// <summary>Continue after a Jammed result once a booster changed the situation.</summary>
@@ -285,7 +306,7 @@ namespace TankerJam.Game
         void Update()
         {
             if (Session == null) return;
-            if (EndState == EndState.Playing && gameCamera != null && input.TryGetTappedTruck(gameCamera, out var rig))
+            if (InputEnabled && EndState == EndState.Playing && gameCamera != null && input.TryGetTappedTruck(gameCamera, out var rig))
             {
                 int id = IndexOf(rig);
                 if (id >= 0) TapTruck(id);

@@ -1,0 +1,10 @@
+{
+    "name": "TankerJam.UI",
+    "rootNamespace": "TankerJam.UI",
+    "references": [
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
+        "DOTween.Modules"
+    ],
+    "autoReferenced": true
+}

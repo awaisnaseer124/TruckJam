@@ -41,6 +41,13 @@ namespace TankerJam.Core
                 foreach (object id in (List<object>)sol) level.Solution.Add(Convert.ToInt32(id));
             if (root.TryGetValue("randomWinRate", out var rate))
                 level.RandomWinRate = (float)Convert.ToDouble(rate);
+            if (root.TryGetValue("meta", out var metaObj) && metaObj is Dictionary<string, object> meta)
+            {
+                if (meta.TryGetValue("index", out var index)) level.Index = Convert.ToInt32(index);
+                if (meta.TryGetValue("tier", out var tier)) level.Tier = Convert.ToInt32(tier);
+                if (meta.TryGetValue("hard", out var hard)) level.Hard = hard is bool b && b;
+                if (meta.TryGetValue("introduces", out var intro)) level.Introduces = intro as string;
+            }
             return level;
         }
 

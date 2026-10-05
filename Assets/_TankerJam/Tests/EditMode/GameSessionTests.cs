@@ -8,6 +8,10 @@ namespace TankerJam.Tests
 {
     public class GameSessionTests
     {
+        /// <summary>The web prototype's "vessels" level, kept as a fixed fixture.</summary>
+        public static string ReferenceLevelPath =>
+            Path.Combine(Application.dataPath, "_TankerJam/Tests/EditMode/Fixtures/reference_level.json");
+
         /// <summary>Five pink trucks facing up in columns 0..4 of a 5x5 lot; empty vessels so slots never fill.</summary>
         static LevelDef OpenLot(int slots = 3)
         {
@@ -140,7 +144,7 @@ namespace TankerJam.Tests
         [Test]
         public void StoredSolutionWinsThroughSession()
         {
-            string path = Path.Combine(Application.dataPath, "_TankerJam/Data/Levels/level_005.json");
+            string path = ReferenceLevelPath;
             var level = LevelJson.Parse(File.ReadAllText(path));
             var s = new GameSession(level, 0, 0);
             foreach (int id in level.Solution)
@@ -155,9 +159,9 @@ namespace TankerJam.Tests
         }
 
         [Test]
-        public void Level005IsStructurallyValid()
+        public void ReferenceLevelIsStructurallyValid()
         {
-            string path = Path.Combine(Application.dataPath, "_TankerJam/Data/Levels/level_005.json");
+            string path = ReferenceLevelPath;
             var errors = new List<string>();
             Assert.IsTrue(LevelJson.Validate(LevelJson.Parse(File.ReadAllText(path)), errors), string.Join("\n", errors));
         }

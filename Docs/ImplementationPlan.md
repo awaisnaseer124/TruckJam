@@ -285,3 +285,29 @@ Events are plain C# (`event Action<…>`) or a small struct queue drained by the
 2. 5th color: green `G #3DDC84`.
 3. Tweens: **DOTween** (package provided by the user).
 4. Unity Editor is driven directly through the Unity MCP connection (scenes, prefabs, tests).
+
+---
+
+## 11. Status (2026-10-05)
+
+| Phase | State | Notes |
+| --- | --- | --- |
+| 0 Foundation | Done | Settings applied by `Tanker Jam > Setup > Apply Mobile Project Settings`. |
+| 1 Greybox loop | Done | Gate passed: reference level wins end to end (PlayMode test). |
+| 2 Feel | Done (needs your review) | Audio is synthesized placeholder; draw calls at peak ~69 (budget test fails above 100). |
+| 3 Content & meta | Done | 50 generated levels, catalog + importer, save/coins/boosters/stars, uGUI HUD + popups + home + tutorials. |
+
+Deviations from the original plan, on purpose:
+- **One scene** (`Game.unity`) with a home overlay instead of Boot + Menu + Game: no scene loads between levels.
+  `AppRoot` is the composition root.
+- **Wheels baked into truck bodies** (no spin) to halve draw calls; `TruckRig.Axles` still supported for final art.
+- **Vessels drawn in one call each** (`VesselLiquid` shader) instead of one mesh per layer.
+- **Level preview window** not built; `Tanker Jam > Dev` (jump to level, previews) covers the need for now.
+- **Fonts**: TextMeshPro's LiberationSans until Bungee/Barlow are imported (swap in `Config/UiTheme.asset`).
+
+How to work with it:
+- New levels: edit `Tools/levelgen/curve.json`, run `python build_curve.py` (all 50 in ~30 s). Unity rebuilds
+  `Data/LevelCatalog.asset` automatically and rejects any level that fails verification.
+- Rebuild generated assets: `Tanker Jam > Setup > Build Greybox Assets / Build UI Prefabs / Create Game Scene`.
+  UI prefabs are generated once; after that edit them directly.
+- Tests: `Tanker Jam > Tests > Run EditMode / Run PlayMode` (results in `Temp/TankerJamTests.txt`).

@@ -12,6 +12,8 @@ namespace TankerJam.Game
         public bool AutoSolve;
         [Range(0.25f, 8f)] public float TimeScale = 1f;
         public bool ShowStats = true;
+        [Tooltip("Retry/booster buttons, status line and end popup. Off when the real HUD is in the scene.")]
+        public bool ShowGameplayControls = true;
 
         readonly SolutionPlayer solver = new SolutionPlayer();
         RenderStats stats;
@@ -60,14 +62,21 @@ namespace TankerJam.Game
             button.fontSize = (int)(14 * s);
 
             float w = Screen.width, pad = 8 * s, bh = 40 * s;
-            if (GUI.Button(new Rect(pad, pad, 90 * s, bh), "Retry", button)) Restart();
-            AutoSolve = GUI.Toggle(new Rect(w - 130 * s - pad, pad, 130 * s, bh), AutoSolve, " Auto-solve", button);
-            if (GUI.Button(new Rect(pad + 98 * s, pad, 90 * s, bh), AudioManager.Muted ? "Sound off" : "Sound on", button))
-                AudioManager.Muted = !AudioManager.Muted;
+            // With the real HUD present, keep dev tools in a corner below the top bar.
+            float top = ShowGameplayControls ? pad : Screen.height * 0.5f;
+            if (ShowGameplayControls)
+            {
+                if (GUI.Button(new Rect(pad, pad, 90 * s, bh), "Retry", button)) Restart();
+                if (GUI.Button(new Rect(pad + 98 * s, pad, 90 * s, bh), AudioManager.Muted ? "Sound off" : "Sound on", button))
+                    AudioManager.Muted = !AudioManager.Muted;
+            }
+            var toggleRect = ShowGameplayControls ? new Rect(w - 130 * s - pad, top, 130 * s, bh) : new Rect(pad, top, 110 * s, bh * 0.7f);
+            AutoSolve = GUI.Toggle(toggleRect, AutoSolve, ShowGameplayControls ? " Auto-solve" : "Auto", button);
             if (ShowStats && stats != null)
-                GUI.Label(new Rect(pad, pad + bh + 4 * s, 260 * s, 110 * s),
+                GUI.Label(new Rect(pad, top + bh + 4 * s, 260 * s, 110 * s),
                     $"{fps:0} fps\ndraw {stats.DrawCalls}  batch {stats.Batches}  setpass {stats.SetPass}\ntris {stats.Triangles / 1000}k  gc {stats.GcBytes} B  blobs {game.ActiveBlobCount}");
 
+            if (!ShowGameplayControls) return;
             var session = game.Session;
             float y = Screen.height - bh - pad;
             string vip = session.VipArmed ? "VIP (armed)" : $"VIP ({session.VipLeft})";
