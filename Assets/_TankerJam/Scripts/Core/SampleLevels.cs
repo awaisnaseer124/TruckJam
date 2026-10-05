@@ -1,31 +1,26 @@
-// Hand-built free-form levels used by tests and the Dev menu before the visual editor exists (F3).
-// Every sample sits on a plain square lot; the shape comes from how the trucks are arranged. The vessel
-// order is shuffled from a seed until the solver finds a win, so a sample is always playable and carries
-// a solution for SolutionPlayer.
+// Ready-made free-form levels used by tests and the Dev menu, built with the same tools the level editor
+// uses (LevelDraft + ShapeTracer). Every sample sits on a plain square lot; the shape comes from how the
+// trucks are arranged. Vessel orders are shuffled from a seed until the solver finds a win, so a sample is
+// always playable and carries a solution for SolutionPlayer.
 using System;
-using System.Collections.Generic;
 
 namespace TankerJam.Core
 {
     public static class SampleLevels
     {
-        static readonly char[] Colors = { 'P', 'Y', 'C', 'G' };
-
         /// <summary>
         /// Ring of spokes: 8 spokes at 45-degree steps around a center cone, two trucks per spoke, all pointing
-        /// outward, so each inner truck waits for the outer truck on its spoke. 16 trucks, 4 colors, 4 vessels.
+        /// outward, so each inner truck waits for the outer truck on its spoke. 16 trucks, 4 colors.
+        /// Built like a designer would: two trucks on one spoke, then 8-fold rotation.
         /// </summary>
         public static LevelDef Radial(int seed = 1)
         {
-            var level = NewLevel(11, "radial-8");
-            level.Obstacles.Add(new Obstacle(0f, 0f, Obstacle.ConeHalfSize));
-            for (int k = 0; k < 8; k++)
-            {
-                float a = k * 45f;
-                TryAdd(level, Geometry2D.Heading(a) * 4.1f, a, Colors[k % 4]);
-                TryAdd(level, Geometry2D.Heading(a) * 2.1f, a, Colors[(k + 1) % 4]);
-            }
-            return Finish(level, seed);
+            var d = new LevelDraft { LotSize = 11, Pattern = "radial-8" };
+            d.Cones.Add(new Vec2(0f, 0f));
+            var seeds = new[] { d.TryAdd(0f, -4.1f, 0f, 2, 'P'), d.TryAdd(0f, -2.1f, 0f, 2, 'Y') };
+            d.RotateCopies(seeds, 8, out _);
+            d.AutoColor("PYCG".ToCharArray(), seed);
+            return Finish(d, seed);
         }
 
         /// <summary>
@@ -34,104 +29,51 @@ namespace TankerJam.Core
         /// </summary>
         public static LevelDef Heart(int seed = 1)
         {
-            var level = NewLevel(12, "heart");
-            int color = 0;
-            Trace(level, 0.29f, 0.85f, ref color);  // outer heart
-            Trace(level, 0.14f, 0.85f, ref color);  // inner heart
-            return Finish(level, seed);
+            var d = new LevelDraft { LotSize = 12, Pattern = "heart" };
+            ShapeTracer.Trace(d, new TraceOptions { Shape = TraceShape.Heart, Size = 4.65f, Spacing = 0.85f });
+            ShapeTracer.Trace(d, new TraceOptions { Shape = TraceShape.Heart, Size = 2.25f, Spacing = 0.85f, Colors = "CGPY" });
+            return Finish(d, seed);
         }
 
-        // ---------------- building blocks ----------------
-
-        static LevelDef NewLevel(int size, string pattern) =>
-            new LevelDef { Version = 2, Size = size, Slots = 3, Board = BoardShape.Rounded(size, size, 0f), Pattern = pattern };
-
-        /// <summary>Classic heart curve; board space has +z toward the camera, so the lobes point up the screen (-z).</summary>
-        static Vec2 HeartPoint(double t, float scale)
+        /// <summary>
+        /// The F4 reference: a bus-jam style mandala rebuilt only with level-editor operations. One "petal"
+        /// of three trucks (a short inner spoke truck, a long outer spoke truck, a tangential truck between
+        /// spokes) copied with 6-fold rotation around a center cone, then auto-colored and auto-filled.
+        /// </summary>
+        public static LevelDef Mandala(int seed = 1)
         {
-            double x = 16 * Math.Pow(Math.Sin(t), 3);
-            double y = 13 * Math.Cos(t) - 5 * Math.Cos(2 * t) - 2 * Math.Cos(3 * t) - Math.Cos(4 * t);
-            // Center the curve vertically (y spans about -17..12).
-            return new Vec2((float)(x * scale), (float)(-(y + 2.5) * scale));
+            var d = MandalaDraft(seed);
+            return Finish(d, seed);
         }
 
-        /// <summary>Walks a heart outline by arc length and stands a truck across it every <paramref name="spacing"/>, pointing outward.</summary>
-        static void Trace(LevelDef level, float scale, float spacing, ref int color)
+        /// <summary>The mandala layout before vessels are filled (what the designer sees after the symmetry step).</summary>
+        public static LevelDraft MandalaDraft(int seed = 1)
         {
-            const int Steps = 2000;
-            var prev = HeartPoint(0, scale);
-            float walked = spacing / 2f;
-            for (int i = 1; i <= Steps; i++)
+            var d = new LevelDraft { LotSize = 12, Pattern = "mandala-6" };
+            d.Cones.Add(new Vec2(0f, 0f));
+            var petal = new[]
             {
-                var p = HeartPoint(i * 2 * Math.PI / Steps, scale);
-                var d = p - prev;
-                walked += d.Length;
-                prev = p;
-                if (walked < spacing) continue;
-                // Outward normal of a curve traced this way: rotate the tangent; flip if it points at the middle.
-                var n = new Vec2(d.Z, -d.X);
-                if (Geometry2D.Dot(n, p) < 0f) n = new Vec2(-n.X, -n.Z);
-                float angle = (float)(Math.Atan2(n.X, -n.Z) * 180.0 / Math.PI);
-                angle = (float)Math.Round(angle / 15.0) * 15f;
-                if (angle < 0f) angle += 360f;
-                // Keep sliding along the curve until a truck fits, so tight bends pack as densely as they can.
-                if (TryAdd(level, p, angle, Colors[color % Colors.Length])) { color++; walked = 0f; }
-            }
-        }
-
-        /// <summary>Adds a length-2 truck if it fits inside the lot without touching another truck or obstacle.</summary>
-        static bool TryAdd(LevelDef level, Vec2 at, float angle, char color)
-        {
-            var t = new TruckDef
-            {
-                Id = level.Trucks.Count, Len = 2, Color = color, HasPose = true,
-                FreePose = new TruckPose(Snap(at.X), Snap(at.Z), angle), Facing = TruckDef.FacingOf(angle),
+                d.TryAdd(0f, -1.6f, 0f, 2, 'P'),                                              // inner spoke, points out
+                d.TryAdd(0f, -4.05f, 0f, 3, 'Y'),                                             // outer spoke, points out
+                Place(d, 30f, 3.0f, 120f),                                                    // between spokes, clockwise
             };
-            var shape = t.Shape(level.Size);
-            for (int k = 0; k < 4; k++)
-                if (!level.Board.Contains(shape.Corner(k), 0.05f)) return false;
-            foreach (var other in level.Trucks)
-                if (Geometry2D.Overlaps(shape, other.Shape(level.Size))) return false;
-            foreach (var o in level.Obstacles)
-                if (Geometry2D.Overlaps(shape, o.Shape)) return false;
-            level.Trucks.Add(t);
-            return true;
+            d.RotateCopies(petal, 6, out _);
+            d.AutoColor("PYCG".ToCharArray(), seed);
+            return d;
         }
 
-        /// <summary>Most units a sample vessel holds (the vessel shader shows up to 16 layers).</summary>
-        const int MaxVesselUnits = 14;
-
-        /// <summary>Fills 4+ vessels with exactly the trucks' oil (shuffled) and keeps the first order the solver wins.</summary>
-        static LevelDef Finish(LevelDef level, int seed)
+        /// <summary>Adds a length-2 truck at polar position (bearing, radius) with the given heading.</summary>
+        static DraftTruck Place(LevelDraft d, float bearing, float radius, float angle)
         {
-            var units = new List<char>();
-            foreach (var t in level.Trucks)
-                for (int u = 0; u < t.Capacity; u++) units.Add(t.Color);
-            int vessels = Math.Max(4, (units.Count + MaxVesselUnits - 1) / MaxVesselUnits);
-            for (int attempt = 0; attempt < 64; attempt++)
-            {
-                var rng = new Random(seed * 1000 + attempt);
-                for (int i = units.Count - 1; i > 0; i--)
-                {
-                    int j = rng.Next(i + 1);
-                    (units[i], units[j]) = (units[j], units[i]);
-                }
-                level.Vessels.Clear();
-                for (int v = 0, start = 0; v < vessels; v++)
-                {
-                    int count = (units.Count - start) / (vessels - v);
-                    level.Vessels.Add(units.GetRange(start, count));
-                    start += count;
-                }
-                var score = LevelSolver.Score(level, 200);
-                if (score.Solve.Status != SolveStatus.Solved) continue;
-                level.Solution = score.Solve.Solution;
-                level.RandomWinRate = score.RandomWinRate;
-                return level;
-            }
-            throw new InvalidOperationException($"No solvable vessel order found for the '{level.Pattern}' sample.");
+            var at = Geometry2D.Heading(bearing) * radius;
+            return d.TryAdd(at.X, at.Z, angle, 2, 'C');
         }
 
-        static float Snap(float v) => (float)Math.Round(v / 0.05) * 0.05f;
+        static LevelDef Finish(LevelDraft d, int seed)
+        {
+            var fill = d.AutoFill(Math.Max(4, d.SuggestedVesselCount(14)), seed, attempts: 64);
+            if (!fill.Solved) throw new InvalidOperationException($"No solvable vessel order found for the '{d.Pattern}' sample.");
+            return d.ToLevel();
+        }
     }
 }

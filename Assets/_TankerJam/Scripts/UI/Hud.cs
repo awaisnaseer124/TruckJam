@@ -64,6 +64,13 @@ namespace TankerJam.UI
             hardChip.SetActive(hard);
         }
 
+        /// <summary>Free-text title (e.g. "TEST LEVEL" for levels opened from the level editor).</summary>
+        public void SetTitle(string title)
+        {
+            levelLabel.text = title;
+            hardChip.SetActive(false);
+        }
+
         public void SetCoins(int coins, bool punch = false)
         {
             coinsLabel.SetText("{0}", coins);

@@ -166,3 +166,24 @@ readable in the data format but nothing uses them.
   The heart builder (trace an outline, stand trucks across it, skip overlaps, fill vessels, solve) is the
   seed of the F5 shape generator and the F4 editor's "trace outline" tool.
 - Tests: 579 EditMode, 15 PlayMode (both samples win end to end), all green.
+
+**F4 done (2026-10-05).** Visual level editor: `Tanker Jam > Level Editor` (Ctrl+Shift+L), or double-click
+a level JSON under Data/.
+- Model in Core, unit-tested without UI: `LevelDraft` (editable square-lot level; load any v1/v2 level,
+  save v2; place/move/rotate with snapping; mirror left-right / top-bottom; k-fold rotated copies that
+  skip collisions; diagnostics for overlaps, off-lot trucks, cone-stuck trucks, blockers per truck, jam
+  depth, oil balance; auto color; vessel fill that searches for a solvable order, optionally aiming at a
+  random-win-rate difficulty; solve + score) and `ShapeTracer` (ring, heart, star, square, diamond,
+  triangle; trucks point outward, inward or along the line; dealt colors).
+- Window (`Editor/LevelEditorWindow.cs`): top-down canvas (bays at the top), select / box select / drag,
+  place and cone tools with a ghost preview, the selected truck's road out and its blockers, red/orange
+  problem outlines; panel for lot size, bays, brush, selection edits, symmetry, shape tracing, colors and
+  vessels (editable per vessel), check + solve report; undo/redo; Samples menu; Save (Drafts/ scratch
+  folder or Data/Levels, verified first) and Play (opens the Game scene and plays the draft as a
+  "TEST LEVEL" that never touches campaign progress; works while already playing too).
+- Gate passed: the reference mandala is rebuilt with editor operations only (one 3-truck petal + 6-fold
+  rotation, auto color, vessel fill), saved and reloaded losslessly, verified, and won end to end in
+  PlayMode (`SampleLevels.Mandala`, Dev menu "Play Mandala Sample"). Every shipped grid level converts
+  into the editor and still verifies.
+- Tests: 599 EditMode, 16 PlayMode, all green. `Tanker Jam > Diagnostics > Capture Level Editor` saves a
+  screenshot of the window to Temp/TankerJamEditor.png.

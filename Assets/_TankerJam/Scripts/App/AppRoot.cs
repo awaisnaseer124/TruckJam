@@ -26,6 +26,7 @@ namespace TankerJam.App
         int boostersUsed;
         bool firstTapTutorial;
         string pendingIntro;       // "vip" / "extra" hint to show once the level is on screen
+        LevelDef testLevel;        // a level from the level editor / dev menu: replayable, never touches progress
         readonly List<ResultPopup.Option> options = new List<ResultPopup.Option>(4);
 
         public PlayerProgress Progress => progress;
@@ -80,10 +81,22 @@ namespace TankerJam.App
             progress.Changed -= OnProgressChanged;
         }
 
+        /// <summary>Where the level editor leaves a level for the next Play (editor only; consumed on start).</summary>
+        public const string EditorPlayLevelPath = "Temp/TankerJamPlayLevel.json";
+
         void Start()
         {
             hud.SetSound(!AudioManager.Muted);
             OnProgressChanged();
+#if UNITY_EDITOR
+            if (System.IO.File.Exists(EditorPlayLevelPath))
+            {
+                string json = System.IO.File.ReadAllText(EditorPlayLevelPath);
+                System.IO.File.Delete(EditorPlayLevelPath);
+                DevPlayLevel(LevelJson.Parse(json));
+                return;
+            }
+#endif
             // Show the next level behind the home screen.
             StartLevel(progress.Level);
             game.InputEnabled = false;
@@ -101,6 +114,7 @@ namespace TankerJam.App
 
         public void StartLevel(int levelPosition)
         {
+            testLevel = null;
             position = levelPosition;
             entry = catalog.At(position);
             var level = LevelJson.Parse(entry.Json.text);
@@ -138,13 +152,19 @@ namespace TankerJam.App
         void Retry()
         {
             if (home.IsOpen) return;
-            StartLevel(position);
+            if (testLevel != null) DevPlayLevel(testLevel);
+            else StartLevel(position);
         }
 
         void OnLevelEnded(EndState state)
         {
             tutorial.Hide();
             game.InputEnabled = false;
+            if (state == EndState.Won && testLevel != null)
+            {
+                popup.ShowWin(PlayerProgress.StarsForBoosters(boostersUsed), 0, false, () => DevPlayLevel(testLevel));
+                return;
+            }
             if (state == EndState.Won)
             {
                 int stars = PlayerProgress.StarsForBoosters(boostersUsed);
@@ -291,11 +311,17 @@ namespace TankerJam.App
         /// <summary>Development helper: play a level that isn't in the catalog (e.g. a free-form sample).</summary>
         public void DevPlayLevel(LevelDef level)
         {
+            testLevel = level;
+            boostersUsed = 0;
+            pendingIntro = null;
+            firstTapTutorial = false;
             home.Hide();
             popup.Hide();
             tutorial.Hide();
             game.Load(level, progress.Boosters(BoosterKind.Vip), progress.Boosters(BoosterKind.Extra));
             game.InputEnabled = true;
+            hud.SetTitle("TEST LEVEL");
+            RefreshBoosters();
         }
 
         public void DevResetProgress()
