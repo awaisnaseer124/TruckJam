@@ -156,3 +156,13 @@ The reference is symmetric. Random placement won't produce that; **patterns** wi
   menu `Tanker Jam > Dev > Play Radial Sample`.
 - Gate passed: the radial level wins end to end in PlayMode (`RadialFreeFormLevelWinsEndToEnd`); all grid
   tests still pass with 45 deg bays. Tests: 578 EditMode, 14 PlayMode, all green.
+
+**Lot direction change (2026-10-05, user).** No round lots: every level uses one plain grey square lot
+(no checker); the *truck arrangement* makes the shape (rings, hearts, any outline). Circle boards stay
+readable in the data format but nothing uses them.
+- `SceneryBuilder.BuildLot`: flat `Palette.Lot` grey with a thin white rim, for grid and free-form levels.
+- Samples on an 11-12 unit square lot: `SampleLevels.Radial` (ring of spokes) and `SampleLevels.Heart`
+  (27 trucks tracing two nested hearts, pointing outward); menu `Tanker Jam > Dev > Play Heart Sample`.
+  The heart builder (trace an outline, stand trucks across it, skip overlaps, fill vessels, solve) is the
+  seed of the F5 shape generator and the F4 editor's "trace outline" tool.
+- Tests: 579 EditMode, 15 PlayMode (both samples win end to end), all green.

@@ -58,11 +58,12 @@ namespace TankerJam.Tests
                 Assert.AreEqual(TruckState.Gone, game.Truck(i).State, $"Truck {i}");
         }
 
-        [Test]
-        public void RadialFreeFormLevelWinsEndToEnd()
+        [TestCase("radial")]
+        [TestCase("heart")]
+        public void FreeFormSampleWinsEndToEnd(string name)
         {
-            // F3 gate: a free-form circle board (trucks at 45-degree steps) plays through the real views.
-            game.Load(SampleLevels.Radial(), 1, 1);
+            // F3 gate: free-form arrangements (trucks at any angle on the square lot) play through the real views.
+            game.Load(name == "heart" ? SampleLevels.Heart() : SampleLevels.Radial(), 1, 1);
             var solver = new SolutionPlayer();
             Simulate(300f, () => game.EndState != EndState.Playing, solver);
             Assert.AreEqual(EndState.Won, game.EndState, $"Ended {game.EndState} at solution step {solver.Step}. Status: {game.Status}");

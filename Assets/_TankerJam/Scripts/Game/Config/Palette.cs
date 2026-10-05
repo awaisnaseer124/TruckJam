@@ -31,6 +31,8 @@ namespace TankerJam.Game
         public Color LotDark = Hex("#C1CDDA");
         public Color Road = Hex("#6E7889");
         public Color BayPad = Hex("#8E99AA");
+        [Tooltip("Parking lot surface (one flat color; the trucks' arrangement makes the shape).")]
+        public Color Lot = Hex("#A3AEBE");
         public Color Vip = Hex("#FFB21A");
         public Color ExtraLocked = Hex("#36D17A");
 

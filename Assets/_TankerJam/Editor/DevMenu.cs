@@ -29,6 +29,9 @@ namespace TankerJam.EditorTools
         [MenuItem("Tanker Jam/Dev/Play Radial Sample")]
         static void RadialSample() => App?.DevPlayLevel(TankerJam.Core.SampleLevels.Radial());
 
+        [MenuItem("Tanker Jam/Dev/Play Heart Sample")]
+        static void HeartSample() => App?.DevPlayLevel(TankerJam.Core.SampleLevels.Heart());
+
         [MenuItem("Tanker Jam/Dev/Preview Win Popup")]
         static void PreviewWin() => App?.DevPreviewPopup(true);
 
@@ -44,6 +47,7 @@ namespace TankerJam.EditorTools
         [MenuItem("Tanker Jam/Dev/Jump To Level 6 (VIP intro)", true)]
         [MenuItem("Tanker Jam/Dev/Jump To Level 10 (Extra bay intro)", true)]
         [MenuItem("Tanker Jam/Dev/Play Radial Sample", true)]
+        [MenuItem("Tanker Jam/Dev/Play Heart Sample", true)]
         [MenuItem("Tanker Jam/Dev/Preview Win Popup", true)]
         [MenuItem("Tanker Jam/Dev/Preview Jammed Popup", true)]
         [MenuItem("Tanker Jam/Dev/Reset Progress", true)]

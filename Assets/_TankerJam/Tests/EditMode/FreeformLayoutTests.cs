@@ -9,10 +9,17 @@ namespace TankerJam.Tests
     {
         const float Eps = 1e-3f;
 
-        [Test]
-        public void RadialSampleIsValidAndSolved()
+        static LevelDef Sample(string name) => name == "heart" ? SampleLevels.Heart() : SampleLevels.Radial();
+
+        [TestCase("radial")]
+        [TestCase("heart")]
+        public void SampleIsValidAndSolved(string name)
         {
-            var level = SampleLevels.Radial();
+            var level = Sample(name);
+            Assert.AreEqual(BoardKind.RoundedRect, level.Board.Kind, "Samples use a square lot.");
+            Assert.AreEqual(level.Board.Width, level.Board.Height);
+            Assert.GreaterOrEqual(level.Trucks.Count, 16);
+            Assert.LessOrEqual(level.MaxVesselHeight, 16, "Vessel shader shows 16 layers.");
             var errors = new List<string>();
             Assert.IsTrue(LevelJson.Validate(level, errors), string.Join("\n", errors));
             Assert.IsTrue(LevelVerifier.Verify(level, errors), string.Join("\n", errors));

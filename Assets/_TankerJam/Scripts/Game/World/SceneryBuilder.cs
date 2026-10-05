@@ -45,10 +45,7 @@ namespace TankerJam.Game
             for (float x = -28f; x < 28f; x += 1.2f)
                 kit.Box(new Vector3(x, 0.02f, p.ExitZ), new Vector3(0.6f, 0.02f, 0.07f), white);
 
-            var light = MeshKit.Fixed(theme != null ? theme.LotLight : pal.LotLight);
-            var dark = MeshKit.Fixed(theme != null ? theme.LotDark : pal.LotDark);
-            if (level.IsGrid) BuildGridLot(L, light, dark, white);
-            else BuildShapedLot(L, light, dark, white);
+            BuildLot(L, MeshKit.Fixed(pal.Lot), white);
 
             BuildBayPad(L, pal);
 
@@ -78,25 +75,11 @@ namespace TankerJam.Game
         readonly List<Obb> obstacles = new List<Obb>();
         readonly List<Vector2> outline = new List<Vector2>(80);
 
-        /// <summary>Grid levels: checker cells with a white border (prototype look).</summary>
-        void BuildGridLot(BoardLayout L, Color32 light, Color32 dark, Color32 white)
-        {
-            var p = L.P;
-            for (int y = 0; y < L.Size; y++)
-                for (int x = 0; x < L.Size; x++)
-                {
-                    var c = L.CellCenter(x, y);
-                    kit.Quad(new Vector3(c.X, LotY, c.Z), 1f, 1f, (x + y) % 2 == 1 ? dark : light);
-                }
-            float half = L.Size / 2f, b = 0.06f, lotZ = L.LotCenter.Z;
-            kit.Quad(new Vector3(0, LotY + 0.002f, p.LotZ0 + b / 2f), L.Size, b, white);
-            kit.Quad(new Vector3(0, LotY + 0.002f, p.LotZ0 + L.Size - b / 2f), L.Size, b, white);
-            kit.Quad(new Vector3(-half + b / 2f, LotY + 0.002f, lotZ), b, L.Size, white);
-            kit.Quad(new Vector3(half - b / 2f, LotY + 0.002f, lotZ), b, L.Size, white);
-        }
-
-        /// <summary>Free-form levels: the board outline (circle / rounded rect) with a white rim and a faint inner ring.</summary>
-        void BuildShapedLot(BoardLayout L, Color32 light, Color32 dark, Color32 white)
+        /// <summary>
+        /// The parking lot: one flat grey area with a thin white rim, the same for grid and free-form levels.
+        /// Shapes (rings, hearts, ...) come from how the trucks are arranged, not from the lot.
+        /// </summary>
+        void BuildLot(BoardLayout L, Color32 fill, Color32 white)
         {
             const float rim = 0.08f;
             var board = L.Board;
@@ -106,17 +89,14 @@ namespace TankerJam.Game
                 MeshKit.CirclePoints(outline, c, board.Radius);
                 kit.FlatPolygon(outline, LotY, white);
                 MeshKit.CirclePoints(outline, c, board.Radius - rim);
-                kit.FlatPolygon(outline, LotY + 0.002f, light);
-                MeshKit.CirclePoints(outline, c, board.Radius * 0.5f);
-                kit.FlatPolygon(outline, LotY + 0.004f, dark);
             }
             else
             {
                 MeshKit.RoundedRectPoints(outline, c, board.Width, board.Height, board.Radius);
                 kit.FlatPolygon(outline, LotY, white);
                 MeshKit.RoundedRectPoints(outline, c, board.Width - 2f * rim, board.Height - 2f * rim, board.Radius - rim);
-                kit.FlatPolygon(outline, LotY + 0.002f, light);
             }
+            kit.FlatPolygon(outline, LotY + 0.002f, fill);
         }
 
         /// <summary>Gray pad under the bay row, covering every (possibly tilted) stall.</summary>
