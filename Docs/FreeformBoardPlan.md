@@ -131,3 +131,13 @@ The reference is symmetric. Random placement won't produce that; **patterns** wi
   toward the bays, clockwise; truck collision = (cells - 0.1) x 0.8; cones = 0.7 squares; positions snap to
   0.05 on load; touching (penetration < 0.01) is not a hit.
 - Not yet: visuals still place trucks from grid fields (F3), solver/generator still in Python (F2).
+
+**F2 done (2026-10-05).**
+- `LevelSolver` (Core, C#): pairwise blocking precomputed from the geometric lot (bitmask exit test),
+  exact port of the settle rule, depth-first search memoized like the Python solver (max 64 trucks,
+  12 vessels, 6 bays), random-play win rate, jam depth, `LevelSolver.Score` for tools.
+- Gate passed: settle and exits match GameRules/FreeLot on every level; C# solves all 51 levels (<= 59
+  nodes, ~1 ms) with solutions that replay as wins; win rates agree with the stored Python rates (within
+  0.1; largest gap 8 points); unsolvable and jam-depth cases; a radial free-form level solves.
+- `Tanker Jam > Levels > Score All Levels` writes Temp/TankerJamScores.txt. Python is reference only
+  (Tools/levelgen/README.md); build_curve.py still generates the grid curve until F5.
