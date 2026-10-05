@@ -47,6 +47,7 @@ namespace TankerJam.Core
         public float PumpZ = -9.3f;
 
         public float VesselSpacing = 2.6f;
+        public int VesselVisibleUnits = 16;   // glass height in units; taller vessels show their bottom layers
         public float VesselZ = -11.6f;
         public float VesselRadius = 0.74f;
         public float VesselUnitHeight = 0.42f;
@@ -80,7 +81,7 @@ namespace TankerJam.Core
             Size = level.Size;
             BayCount = level.Slots + 2;
             VesselCount = level.Vessels.Count;
-            MaxVesselUnits = Math.Max(1, level.MaxVesselHeight);
+            MaxVesselUnits = Math.Max(1, Math.Min(level.MaxVesselHeight, P.VesselVisibleUnits));
             Board = level.Board;
             HalfWidth = Board.Width / 2f;
             HalfHeight = Board.Height / 2f;

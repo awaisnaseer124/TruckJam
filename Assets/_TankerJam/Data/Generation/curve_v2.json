@@ -1,0 +1,12 @@
+{
+  "_comment": "Shape-level curve (F5). Levels before firstLevel stay hand-tuned grid levels. Each tier gives the lot size, bays, colors, truck count, truck lengths, the random-win-rate band (lower = harder) and the minimum jam depth. vessels = minimum vessel count (more are added when the oil would not fit 14 per vessel; max 6). Every hardEvery-th level is Hard (aims at the low end of its band), the level after it is a breather (high end). families: petals, mirror, trace.",
+  "firstLevel": 11,
+  "lastLevel": 50,
+  "hardEvery": 5,
+  "tiers": [
+    { "tier": 4, "from": 11, "to": 15, "lot": 10, "slots": 3, "colors": 3, "vessels": 4, "trucks": [10, 14], "lens": [2, 2, 3],    "rate": [0.35, 0.60], "depth": 2, "families": ["petals", "mirror", "trace"] },
+    { "tier": 5, "from": 16, "to": 25, "lot": 11, "slots": 3, "colors": 4, "vessels": 4, "trucks": [13, 18], "lens": [2, 2, 3],    "rate": [0.20, 0.40], "depth": 2, "families": ["petals", "mirror", "trace"] },
+    { "tier": 6, "from": 26, "to": 40, "lot": 12, "slots": 3, "colors": 4, "vessels": 4, "trucks": [16, 22], "lens": [2, 2, 3, 3], "rate": [0.10, 0.30], "depth": 2, "families": ["petals", "mirror", "trace"] },
+    { "tier": 7, "from": 41, "to": 50, "lot": 12, "slots": 3, "colors": 5, "vessels": 5, "trucks": [16, 24], "lens": [2, 2, 3],    "rate": [0.05, 0.20], "depth": 3, "families": ["petals", "mirror", "trace"] }
+  ]
+}

@@ -58,14 +58,39 @@ namespace TankerJam.Tests
                 Assert.AreEqual(TruckState.Gone, game.Truck(i).State, $"Truck {i}");
         }
 
+        /// <summary>Free-form levels for the end-to-end tests.</summary>
+        static LevelDef FreeForm(string name)
+        {
+            switch (name)
+            {
+                case "heart": return SampleLevels.Heart();
+                case "mandala": return SampleLevels.Mandala();
+                case "tall":
+                {
+                    // Two vessels of 21 units: more than the 16 layers a vessel shows at once.
+                    var d = SampleLevels.MandalaDraft();
+                    Assert.IsTrue(d.AutoFill(2, 1, 64).Solved);
+                    return d.ToLevel();
+                }
+                case "radial": return SampleLevels.Radial();
+                default: // a shipped generated shape level
+                    return LevelJson.Parse(System.IO.File.ReadAllText(
+                        System.IO.Path.Combine(Application.dataPath, $"_TankerJam/Data/Levels/{name}.json")));
+            }
+        }
+
         [TestCase("radial")]
         [TestCase("heart")]
         [TestCase("mandala")]
+        [TestCase("tall")]
+        [TestCase("level_023")]
+        [TestCase("level_045")]
         public void FreeFormSampleWinsEndToEnd(string name)
         {
-            // F3/F4 gates: free-form arrangements (trucks at any angle on the square lot) play through the real
-            // views; "mandala" is the reference layout rebuilt with level-editor operations only.
-            game.Load(name == "heart" ? SampleLevels.Heart() : name == "mandala" ? SampleLevels.Mandala() : SampleLevels.Radial(), 1, 1);
+            // F3/F4/F5 gates: free-form arrangements (trucks at any angle on the square lot) play through the
+            // real views; "mandala" is the reference layout rebuilt with level-editor operations only; "tall"
+            // has vessels taller than the glass; level_0NN are generated shape levels (level 45: 5 vessels).
+            game.Load(FreeForm(name), 1, 1);
             var solver = new SolutionPlayer();
             Simulate(300f, () => game.EndState != EndState.Playing, solver);
             Assert.AreEqual(EndState.Won, game.EndState, $"Ended {game.EndState} at solution step {solver.Step}. Status: {game.Status}");

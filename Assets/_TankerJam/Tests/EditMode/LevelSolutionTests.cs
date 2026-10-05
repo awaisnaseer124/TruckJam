@@ -9,15 +9,10 @@ namespace TankerJam.Tests
     /// <summary>Every shipped level (and the reference level) must be valid, fit the renderer, and win.</summary>
     public class LevelSolutionTests
     {
-        const int MaxVesselUnits = 16; // VesselLiquid shader layer limit
+        const int MaxVesselUnits = LevelVerifier.MaxVesselUnits;
         const int MaxRegularBays = 4;
 
-        static string[] LevelFiles()
-        {
-            var files = new List<string>(Directory.GetFiles(Path.Combine(Application.dataPath, "_TankerJam/Data/Levels"), "*.json"));
-            files.Add(GameSessionTests.ReferenceLevelPath);
-            return files.ToArray();
-        }
+        static string[] LevelFiles() => TestLevels.ShippedAndReference();
 
         [TestCaseSource(nameof(LevelFiles))]
         public void LevelIsValidAndFitsTheBoard(string path)
@@ -25,7 +20,7 @@ namespace TankerJam.Tests
             var level = LevelJson.Parse(File.ReadAllText(path));
             var errors = new List<string>();
             Assert.IsTrue(LevelJson.Validate(level, errors), string.Join("\n", errors));
-            Assert.LessOrEqual(level.MaxVesselHeight, MaxVesselUnits, "Vessel too tall for the VesselLiquid shader.");
+            Assert.LessOrEqual(level.MaxVesselHeight, MaxVesselUnits, "Vessel holds more units than the solver and verifier allow.");
             Assert.LessOrEqual(level.Slots, MaxRegularBays, "Too many regular bays for the bay row.");
         }
 

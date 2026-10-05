@@ -2,6 +2,8 @@
 // ONE cylinder drawn with the VesselLiquid shader, which picks each layer's color by height from arrays in a
 // MaterialPropertyBlock. Draining the bottom layer makes everything above sink smoothly; small squash while
 // the tap is open and a wobble on the top surface (prototype syncVessel()).
+// Tall vessels (more units than MaxLayers) keep every unit logically but draw only the bottom MaxLayers;
+// the hidden ones sink into view as the bottom drains.
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -21,7 +23,7 @@ namespace TankerJam.Game
             public float Amount; // 1 = full unit, 0 = gone
         }
 
-        readonly List<Layer> layers = new List<Layer>(MaxLayers);
+        readonly List<Layer> layers = new List<Layer>(32);
         readonly Transform root, column;
         readonly MeshRenderer renderer;
         readonly MaterialPropertyBlock block = new MaterialPropertyBlock();
@@ -48,6 +50,8 @@ namespace TankerJam.Game
         }
 
         public int LayerCount => layers.Count;
+        /// <summary>Units above the visible column (tall vessels).</summary>
+        public int HiddenLayers => Mathf.Max(0, layers.Count - MaxLayers);
 
         public void Setup(Vector3 position, IReadOnlyList<char> units, float vesselRadius, float layerHeight, float baseHeight, Palette pal)
         {
@@ -59,8 +63,7 @@ namespace TankerJam.Game
             unitHeight = layerHeight;
             baseY = baseHeight + 0.02f;
             wave = valve = 0f;
-            if (units.Count > MaxLayers) Debug.LogError($"Vessel has {units.Count} units; the shader supports {MaxLayers}.");
-            for (int i = 0; i < units.Count && i < MaxLayers; i++) layers.Add(new Layer { Color = units[i], Amount = 1f });
+            for (int i = 0; i < units.Count; i++) layers.Add(new Layer { Color = units[i], Amount = 1f });
             colorsDirty = true;
             Layout(0f);
         }
@@ -109,7 +112,7 @@ namespace TankerJam.Game
 
         void Layout(float time)
         {
-            int n = layers.Count;
+            int n = Mathf.Min(layers.Count, MaxLayers);
             if (n == 0)
             {
                 if (renderer.enabled) renderer.enabled = false;

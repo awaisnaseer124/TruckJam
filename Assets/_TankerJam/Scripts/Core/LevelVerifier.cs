@@ -7,9 +7,13 @@ namespace TankerJam.Core
 {
     public static class LevelVerifier
     {
-        public const int MaxVesselUnits = 16; // VesselLiquid shader layer limit
+        /// <summary>Units one vessel may hold. Vessels draw only their bottom <see cref="VisibleVesselUnits"/>
+        /// layers; the rest sink into view as the bottom drains (solver limit: 31).</summary>
+        public const int MaxVesselUnits = 30;
+        /// <summary>Layers a vessel shows at once (VesselLiquid shader array size).</summary>
+        public const int VisibleVesselUnits = 16;
         public const int MaxRegularBays = 4;
-        public const int MaxVessels = 5;
+        public const int MaxVessels = 6;
 
         public static bool Verify(LevelDef level, List<string> errors)
         {

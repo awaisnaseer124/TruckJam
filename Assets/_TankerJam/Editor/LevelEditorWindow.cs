@@ -48,6 +48,8 @@ namespace TankerJam.EditorTools
         [SerializeField] float targetWinRate = 0.3f;
         [SerializeField] bool useTargetRate;
         [SerializeField] int seed = 1;
+        [SerializeField] int genLevel = 20;
+        [SerializeField] int genFamily;                 // 0 = any, else PatternFamily + 1
         [SerializeField] float zoom = 1f;
         [SerializeField] Vector2 pan;
         [SerializeField] Vector2 panelScroll;
@@ -467,6 +469,11 @@ namespace TankerJam.EditorTools
                 Symmetry($"{symmetryK}-fold rotation", src => (draft.RotateCopies(src, symmetryK, out int r), r));
             EditorGUILayout.EndHorizontal();
 
+            Header("Generate");
+            genLevel = EditorGUILayout.IntSlider("Like curve level", genLevel, 11, 50);
+            genFamily = EditorGUILayout.Popup("Layout", genFamily, new[] { "Any", "Petals (rotation)", "Mirror", "Traced shape" });
+            if (GUILayout.Button($"Generate (seed {seed})")) Generate();
+
             Header("Trace a shape");
             traceShape = (TraceShape)EditorGUILayout.EnumPopup("Shape", traceShape);
             traceFacing = (TraceFacing)EditorGUILayout.EnumPopup("Trucks point", traceFacing);
@@ -633,6 +640,28 @@ namespace TankerJam.EditorTools
                 Say($"Vessels filled after {fill.Attempts} tries: solvable, random win rate {fill.Score.RandomWinRate:P0} ({Difficulty(fill.Score.RandomWinRate)}).");
             else
                 Say($"No solvable vessel order in {fill.Attempts} tries. Try another seed, more bays, fewer colors, or a less tangled layout.", MessageType.Warning);
+        }
+
+        void Generate()
+        {
+            if (!ConfirmDiscard()) return;
+            PatternCurve curve;
+            try { curve = PatternLevelBuilder.LoadCurve(); }
+            catch (System.Exception e) { Say("Can't read the curve: " + e.Message, MessageType.Error); return; }
+            var spec = curve.SpecFor(genLevel, genFamily == 0 ? (PatternFamily?)null : (PatternFamily)(genFamily - 1), seedOffset: seed);
+            var r = PatternGenerator.Generate(spec);
+            if (!r.Ok) { Say("Nothing in band: " + r.Failure + ". Try another seed or layout.", MessageType.Warning); return; }
+            Record();
+            draft = r.Draft;
+            draft.Index = 0;
+            path = null;
+            dirty = true;
+            selection.Clear();
+            vesselCount = draft.Vessels.Count;
+            lastScore = r.Score;
+            Changed(invalidate: false);
+            Say($"Generated '{r.Pattern}' like level {genLevel}: {draft.Trucks.Count} trucks, random win rate {r.Score.RandomWinRate:P0} " +
+                $"({Difficulty(r.Score.RandomWinRate)}), jam depth {r.JamDepth}. Change the seed to re-roll.");
         }
 
         void Trace()

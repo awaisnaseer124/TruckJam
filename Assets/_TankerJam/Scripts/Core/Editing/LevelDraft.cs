@@ -354,8 +354,11 @@ namespace TankerJam.Core
             Invalidate();
         }
 
+        /// <summary>Units per vessel the tools aim for: every unit visible, with a little headroom.</summary>
+        public const int ComfortableVesselUnits = 14;
+
         /// <summary>Smallest vessel count that keeps every vessel within <paramref name="maxUnits"/> (at least 3).</summary>
-        public int SuggestedVesselCount(int maxUnits = LevelVerifier.MaxVesselUnits)
+        public int SuggestedVesselCount(int maxUnits = ComfortableVesselUnits)
         {
             int units = 0;
             foreach (var t in Trucks) units += TruckDef.CapacityFor(t.Len);

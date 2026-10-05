@@ -187,3 +187,29 @@ a level JSON under Data/.
   into the editor and still verifies.
 - Tests: 599 EditMode, 16 PlayMode, all green. `Tanker Jam > Diagnostics > Capture Level Editor` saves a
   screenshot of the window to Temp/TankerJamEditor.png.
+
+**F5 done (2026-10-05).** Shape levels 11-50 are generated in C#; levels 1-10 stay hand-tuned grid levels.
+- Oil supply: up to 6 vessels (`LevelVerifier.MaxVessels`); a vessel may hold up to 30 units
+  (`MaxVesselUnits`) but its glass shows 16 layers (`VisibleVesselUnits`, `LayoutParams.VesselVisibleUnits`);
+  hidden units sink into view as the bottom drains (`VesselView`). Tools aim for 14 units per vessel.
+- `PatternGenerator` (Core): layout families **petals** (a random cluster copied 3/4/6/8-fold),
+  **mirror** (a random half mirrored 2- or 4-way) and **trace** (a dense outline of outward-facing
+  trucks filling the lot, plus a second outline or a k-fold core that waits for it). A candidate must be
+  exactly symmetric (no skipped copies), clean, deep enough, solvable, and its random-win rate must land
+  in the band (vessel order searched toward a target rate). Seeded and deterministic.
+- `PatternCurve` + `Data/Generation/curve_v2.json`: tiers 4-7 (lot 10-12, 3-5 colors, 4-5 vessels,
+  10-24 trucks; traced outlines may use 10 more because they only read as shapes when dense), same
+  sawtooth as the grid curve (every 5th level Hard at the low end of its band, the next a breather).
+  Families alternate petals / mirror / trace through the curve.
+- `Tanker Jam > Levels > Generate Shape Levels (curve v2)` writes Data/Levels/level_011..050.json and
+  Temp/TankerJamGenerate.txt (about 10-20 s); the catalog importer verifies them (50 levels, 0 rejected).
+  The level editor has a Generate section (like curve level N, choose layout family, seed to re-roll).
+- The original grid levels 11-50 are kept in Tests/EditMode/Fixtures/Levels so the Python-parity, grid-vs-
+  geometric and solver tests keep their coverage (`TestLevels` helper).
+- Environment props that overlap a level's play area (bigger lots, 5-6 vessels) are hidden per level.
+- Gate passed: each tier batch-generates in band (4 seeds per tier), every family is symmetric, shipped
+  levels 11-50 match their tier, band, Hard flag and a reproducible stored rate; generated levels 23 and
+  45 (5 vessels) and a tall-vessel level (21 units per vessel) win end to end in PlayMode.
+- Tests: 770 EditMode, 20 PlayMode, all green.
+- Tuning notes: traced levels currently come out as hearts and stars (convex outlines rarely reach the
+  required depth with a core); the last tier (depth 3) is all petals and mirrors.

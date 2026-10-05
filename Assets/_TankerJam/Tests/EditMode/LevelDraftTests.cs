@@ -153,7 +153,7 @@ namespace TankerJam.Tests
         [Test]
         public void ConvertedGridLevelsKeepTheirSolutions()
         {
-            foreach (var file in Directory.GetFiles(Path.Combine(Application.dataPath, "_TankerJam/Data/Levels"), "*.json"))
+            foreach (var file in TestLevels.All())
             {
                 var level = LevelJson.Parse(File.ReadAllText(file));
                 var converted = LevelDraft.From(level).ToLevel();

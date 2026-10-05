@@ -141,6 +141,7 @@ namespace TankerJam.Game
 
             scenery.Build(boardRoot, level, layout, config.Palette, mats, config.Environment);
             environment.Apply(config.Environment);
+            environment.Fit(layout);
             BuildVessels();
             BuildHoses();
             bayRow.Rebuild(Session.Bays, layout, config.Palette);

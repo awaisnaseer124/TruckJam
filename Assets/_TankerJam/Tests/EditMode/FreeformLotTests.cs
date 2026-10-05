@@ -11,12 +11,7 @@ namespace TankerJam.Tests
 {
     public class FreeformLotTests
     {
-        static string[] LevelFiles()
-        {
-            var files = new List<string>(Directory.GetFiles(Path.Combine(Application.dataPath, "_TankerJam/Data/Levels"), "*.json"));
-            files.Add(GameSessionTests.ReferenceLevelPath);
-            return files.ToArray();
-        }
+        static string[] LevelFiles() => TestLevels.Grid();
 
         static LevelDef Load(string path) => LevelJson.Parse(File.ReadAllText(path));
 

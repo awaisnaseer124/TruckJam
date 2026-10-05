@@ -1,165 +1,28 @@
 {
- "size": 7,
+ "version": 2,
+ "board": {"shape": "rect", "width": 12, "height": 12},
  "slots": 3,
- "cars": [
-  {
-   "x": 4,
-   "y": 0,
-   "len": 3,
-   "d": "D",
-   "color": "P"
-  },
-  {
-   "x": 2,
-   "y": 4,
-   "len": 4,
-   "d": "R",
-   "color": "Y"
-  },
-  {
-   "x": 0,
-   "y": 4,
-   "len": 2,
-   "d": "D",
-   "color": "C"
-  },
-  {
-   "x": 0,
-   "y": 0,
-   "len": 2,
-   "d": "D",
-   "color": "V"
-  },
-  {
-   "x": 3,
-   "y": 5,
-   "len": 2,
-   "d": "D",
-   "color": "P"
-  },
-  {
-   "x": 6,
-   "y": 3,
-   "len": 3,
-   "d": "U",
-   "color": "Y"
-  },
-  {
-   "x": 5,
-   "y": 6,
-   "len": 2,
-   "d": "R",
-   "color": "C"
-  },
-  {
-   "x": 6,
-   "y": 1,
-   "len": 2,
-   "d": "U",
-   "color": "V"
-  },
-  {
-   "x": 5,
-   "y": 0,
-   "len": 2,
-   "d": "R",
-   "color": "P"
-  },
-  {
-   "x": 2,
-   "y": 3,
-   "len": 3,
-   "d": "R",
-   "color": "Y"
-  },
-  {
-   "x": 2,
-   "y": 1,
-   "len": 2,
-   "d": "L",
-   "color": "C"
-  },
-  {
-   "x": 1,
-   "y": 6,
-   "len": 2,
-   "d": "R",
-   "color": "V"
-  }
+ "trucks": [
+  {"x": 1, "z": 3, "angle": 90, "len": 2, "color": "C"},
+  {"x": 5, "z": 1, "angle": 45, "len": 2, "color": "Y"},
+  {"x": 1, "z": 5, "angle": 45, "len": 2, "color": "P"},
+  {"x": 3, "z": 4.5, "angle": 135, "len": 2, "color": "G"},
+  {"x": -1, "z": 3, "angle": 270, "len": 2, "color": "G"},
+  {"x": -5, "z": 1, "angle": 315, "len": 2, "color": "Y"},
+  {"x": -1, "z": 5, "angle": 315, "len": 2, "color": "P"},
+  {"x": -3, "z": 4.5, "angle": 225, "len": 2, "color": "G"},
+  {"x": 1, "z": -3, "angle": 90, "len": 2, "color": "C"},
+  {"x": 5, "z": -1, "angle": 135, "len": 2, "color": "G"},
+  {"x": 1, "z": -5, "angle": 135, "len": 2, "color": "Y"},
+  {"x": 3, "z": -4.5, "angle": 45, "len": 2, "color": "P"},
+  {"x": -1, "z": -3, "angle": 270, "len": 2, "color": "C"},
+  {"x": -5, "z": -1, "angle": 225, "len": 2, "color": "P"},
+  {"x": -1, "z": -5, "angle": 225, "len": 2, "color": "Y"},
+  {"x": -3, "z": -4.5, "angle": 315, "len": 2, "color": "C"}
  ],
- "cones": [
-  [
-   3,
-   0
-  ],
-  [
-   3,
-   2
-  ]
- ],
- "tubes": [
-  [
-   "V",
-   "V",
-   "C",
-   "C",
-   "C",
-   "C",
-   "P",
-   "P"
-  ],
-  [
-   "V",
-   "V",
-   "V",
-   "Y",
-   "Y",
-   "Y",
-   "Y",
-   "Y",
-   "Y"
-  ],
-  [
-   "P",
-   "P",
-   "P",
-   "P",
-   "Y",
-   "Y",
-   "Y",
-   "C"
-  ],
-  [
-   "V",
-   "P",
-   "P",
-   "Y",
-   "Y",
-   "C",
-   "Y",
-   "Y",
-   "Y"
-  ]
- ],
- "sol": [
-  2,
-  3,
-  4,
-  6,
-  8,
-  7,
-  5,
-  1,
-  11,
-  9,
-  0,
-  10
- ],
- "randomWinRate": 0.2733333333333333,
- "meta": {
-  "index": 36,
-  "tier": 5,
-  "hard": false,
-  "seed": 36000
- }
+ "obstacles": [],
+ "tubes": [["C","C","G","P","G","P","P","Y"], ["C","G","Y","C","P","G","Y","P"], ["Y","P","G","Y","G","P","G","Y"], ["G","C","C","Y","C","Y","C","P"]],
+ "sol": [0, 1, 3, 2, 4, 5, 7, 6, 8, 9, 11, 10, 12, 13, 15, 14],
+ "randomWinRate": 0.26,
+ "meta": {"index": 36, "tier": 6, "hard": false, "pattern": "mirror-4"}
 }
