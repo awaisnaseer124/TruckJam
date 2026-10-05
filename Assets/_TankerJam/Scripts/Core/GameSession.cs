@@ -171,6 +171,8 @@ namespace TankerJam.Core
             bool baysEmpty = true;
             foreach (var b in bays) if (b.TruckId >= 0) { baysEmpty = false; break; }
             if (Rules.IsWon && baysEmpty) return EndState.Won;
+            // An armed VIP lift is always a legal move (it takes any truck, even a blocked one): not jammed.
+            if (VipArmed && Rules.TrucksInLot > 0) return EndState.Playing;
             if (!HasFreeBay) return EndState.JammedBaysFull;
             if (!Rules.AnyTruckCanExit()) return EndState.JammedNoExit;
             return EndState.Playing;

@@ -69,6 +69,23 @@ namespace TankerJam.Tests
         }
 
         [Test]
+        public void ArmedVipLiftIsNotAJam()
+        {
+            // Bays full -> jammed; arming the VIP lift is a pending move, so the level is playable again until
+            // the lift is used (or disarmed).
+            var s = new GameSession(OpenLot(), 1, 0);
+            for (int i = 0; i < 3; i++) s.Tap(i);
+            Assert.AreEqual(EndState.JammedBaysFull, s.Evaluate());
+            Assert.IsTrue(s.ToggleVip());
+            Assert.AreEqual(EndState.Playing, s.Evaluate());
+            Assert.IsTrue(s.ToggleVip(), "disarm");
+            Assert.AreEqual(EndState.JammedBaysFull, s.Evaluate());
+            s.ToggleVip();
+            Assert.AreEqual(TapOutcome.VipLifted, s.Tap(3).Outcome);
+            Assert.AreEqual(EndState.JammedBaysFull, s.Evaluate(), "lift used, VIP bay now busy");
+        }
+
+        [Test]
         public void BlockedTapReportsFreeCellsAndKeepsState()
         {
             var level = OpenLot();

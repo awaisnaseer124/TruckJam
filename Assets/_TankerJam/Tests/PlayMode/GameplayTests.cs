@@ -92,6 +92,32 @@ namespace TankerJam.Tests
         }
 
         [Test]
+        public void VipFromTheJamPopupStaysPlayableUntilTapped()
+        {
+            // Regression: arming the VIP lift after a "bays full" jam used to re-declare the jam a moment
+            // later (before the player could tap), so the popup came straight back.
+            // Five pink trucks facing up (columns 0-4) and a yellow truck across the top-left that blocks
+            // columns 0 and 1. The vessel's bottom is yellow, so pink trucks in the bays can't fill.
+            var level = new LevelDef { Size = 5, Slots = 3 };
+            for (int i = 0; i < 5; i++)
+                level.Trucks.Add(new TruckDef { Id = i, X = i, Y = 3, Len = 2, Facing = Facing.U, Color = 'P' });
+            level.Trucks.Add(new TruckDef { Id = 5, X = 0, Y = 0, Len = 2, Facing = Facing.R, Color = 'Y' });
+            var tube = new System.Collections.Generic.List<char> { 'Y', 'Y' };
+            for (int u = 0; u < 10; u++) tube.Add('P');
+            level.Vessels.Add(tube);
+            game.Load(level, 1, 0);
+            for (int i = 2; i < 5; i++) { game.TapTruck(i); Simulate(0.2f); }
+            Simulate(10f, () => game.EndState != EndState.Playing);
+            Assert.AreEqual(EndState.JammedBaysFull, game.EndState);
+
+            Assert.IsTrue(game.ToggleVip());
+            Simulate(3f);
+            Assert.AreEqual(EndState.Playing, game.EndState, "armed VIP keeps the level playable");
+            game.TapTruck(0); // blocked by the yellow truck, but the VIP lift takes it anyway
+            Assert.AreEqual(TruckState.Lifting, game.Truck(0).State);
+        }
+
+        [Test]
         public void BlockedTapBumpsAndReturnsHome()
         {
             // Truck 0 faces up in column 1; truck 8 covers (1,0).
