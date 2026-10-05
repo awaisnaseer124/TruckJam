@@ -45,30 +45,20 @@ namespace TankerJam.Game
             for (float x = -28f; x < 28f; x += 1.2f)
                 kit.Box(new Vector3(x, 0.02f, p.ExitZ), new Vector3(0.6f, 0.02f, 0.07f), white);
 
-            // Lot checker (vertex colored cells) with a white border.
             var light = MeshKit.Fixed(theme != null ? theme.LotLight : pal.LotLight);
             var dark = MeshKit.Fixed(theme != null ? theme.LotDark : pal.LotDark);
-            for (int y = 0; y < L.Size; y++)
-                for (int x = 0; x < L.Size; x++)
-                {
-                    var c = L.CellCenter(x, y);
-                    kit.Quad(new Vector3(c.X, LotY, c.Z), 1f, 1f, (x + y) % 2 == 1 ? dark : light);
-                }
-            float half = L.Size / 2f, b = 0.06f, lotZ = L.LotCenter.Z;
-            kit.Quad(new Vector3(0, LotY + 0.002f, p.LotZ0 + b / 2f), L.Size, b, white);
-            kit.Quad(new Vector3(0, LotY + 0.002f, p.LotZ0 + L.Size - b / 2f), L.Size, b, white);
-            kit.Quad(new Vector3(-half + b / 2f, LotY + 0.002f, lotZ), b, L.Size, white);
-            kit.Quad(new Vector3(half - b / 2f, LotY + 0.002f, lotZ), b, L.Size, white);
+            if (level.IsGrid) BuildGridLot(L, light, dark, white);
+            else BuildShapedLot(L, light, dark, white);
 
-            // Bay pad.
-            float padW = (L.BayRowMaxX - L.BayRowMinX) + p.BayWidth + 0.5f;
-            kit.Quad(new Vector3(0, PadY, L.BayPlaneZ), padW, p.BayLength + 0.5f, MeshKit.Fixed(pal.BayPad));
+            BuildBayPad(L, pal);
 
-            // Cones.
+            // Cones: grid cones and free-form obstacles (both in board space).
             var cone = MeshKit.Fixed(pal.Cone);
-            foreach (var cell in level.Cones)
+            obstacles.Clear();
+            level.CollectObstacles(obstacles);
+            foreach (var o in obstacles)
             {
-                var c = L.CellCenter(cell.X, cell.Y);
+                var c = L.ToWorld(o.Center);
                 var at = new Vector3(c.X, 0, c.Z);
                 kit.Box(at + new Vector3(0, 0.025f, 0), new Vector3(0.5f, 0.05f, 0.5f), cone);
                 kit.Cylinder(Matrix4x4.Translate(at + new Vector3(0, 0.35f, 0)), 0.24f, 0.01f, 0.6f, 16, cone, true, false);
@@ -83,6 +73,69 @@ namespace TankerJam.Game
             staticRenderer.GetComponent<MeshFilter>().sharedMesh = staticMesh;
             glassMesh = glassKit.ToMesh("VesselGlass", glassMesh);
             glassRenderer.GetComponent<MeshFilter>().sharedMesh = glassMesh;
+        }
+
+        readonly List<Obb> obstacles = new List<Obb>();
+        readonly List<Vector2> outline = new List<Vector2>(80);
+
+        /// <summary>Grid levels: checker cells with a white border (prototype look).</summary>
+        void BuildGridLot(BoardLayout L, Color32 light, Color32 dark, Color32 white)
+        {
+            var p = L.P;
+            for (int y = 0; y < L.Size; y++)
+                for (int x = 0; x < L.Size; x++)
+                {
+                    var c = L.CellCenter(x, y);
+                    kit.Quad(new Vector3(c.X, LotY, c.Z), 1f, 1f, (x + y) % 2 == 1 ? dark : light);
+                }
+            float half = L.Size / 2f, b = 0.06f, lotZ = L.LotCenter.Z;
+            kit.Quad(new Vector3(0, LotY + 0.002f, p.LotZ0 + b / 2f), L.Size, b, white);
+            kit.Quad(new Vector3(0, LotY + 0.002f, p.LotZ0 + L.Size - b / 2f), L.Size, b, white);
+            kit.Quad(new Vector3(-half + b / 2f, LotY + 0.002f, lotZ), b, L.Size, white);
+            kit.Quad(new Vector3(half - b / 2f, LotY + 0.002f, lotZ), b, L.Size, white);
+        }
+
+        /// <summary>Free-form levels: the board outline (circle / rounded rect) with a white rim and a faint inner ring.</summary>
+        void BuildShapedLot(BoardLayout L, Color32 light, Color32 dark, Color32 white)
+        {
+            const float rim = 0.08f;
+            var board = L.Board;
+            var c = new Vector2(L.LotCenter.X, L.LotCenter.Z);
+            if (board.Kind == BoardKind.Circle)
+            {
+                MeshKit.CirclePoints(outline, c, board.Radius);
+                kit.FlatPolygon(outline, LotY, white);
+                MeshKit.CirclePoints(outline, c, board.Radius - rim);
+                kit.FlatPolygon(outline, LotY + 0.002f, light);
+                MeshKit.CirclePoints(outline, c, board.Radius * 0.5f);
+                kit.FlatPolygon(outline, LotY + 0.004f, dark);
+            }
+            else
+            {
+                MeshKit.RoundedRectPoints(outline, c, board.Width, board.Height, board.Radius);
+                kit.FlatPolygon(outline, LotY, white);
+                MeshKit.RoundedRectPoints(outline, c, board.Width - 2f * rim, board.Height - 2f * rim, board.Radius - rim);
+                kit.FlatPolygon(outline, LotY + 0.002f, light);
+            }
+        }
+
+        /// <summary>Gray pad under the bay row, covering every (possibly tilted) stall.</summary>
+        void BuildBayPad(BoardLayout L, Palette pal)
+        {
+            var p = L.P;
+            float minX = float.MaxValue, maxX = float.MinValue, minZ = float.MaxValue, maxZ = float.MinValue;
+            for (int i = 0; i < L.BayCount; i++)
+            {
+                var stall = new Obb(L.StallCenter(i), L.BayAxis, p.BayLength / 2f, p.BayWidth / 2f);
+                for (int k = 0; k < 4; k++)
+                {
+                    var q = stall.Corner(k);
+                    minX = Mathf.Min(minX, q.X); maxX = Mathf.Max(maxX, q.X);
+                    minZ = Mathf.Min(minZ, q.Z); maxZ = Mathf.Max(maxZ, q.Z);
+                }
+            }
+            const float margin = 0.25f;
+            kit.Quad(new Vector3((minX + maxX) / 2f, PadY, (minZ + maxZ) / 2f), maxX - minX + 2f * margin, maxZ - minZ + 2f * margin, MeshKit.Fixed(pal.BayPad));
         }
 
         void BuildPipes(BoardLayout L, Palette pal)

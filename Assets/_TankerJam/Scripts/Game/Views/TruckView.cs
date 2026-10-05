@@ -52,6 +52,9 @@ namespace TankerJam.Game
         public bool IsBusy => State != TruckState.Lot || bumpActive;
 
         Vector3 home;
+        Vec2 homeHeading;          // world heading in the lot
+        Vec2 parkAxis = new Vec2(0f, -1f);  // world heading once parked (bay tilt)
+        float liftTargetYaw;
         float yaw;
         // Path following.
         float s, v;
@@ -97,7 +100,8 @@ namespace TankerJam.Game
 
             var h = layout.TruckHome(def);
             home = new Vector3(h.X, 0f, h.Z);
-            yaw = YawOf(def.Facing);
+            homeHeading = layout.TruckHeading(def);
+            yaw = BoardLayout.Yaw(homeHeading);
             Transform.SetPositionAndRotation(home, Quaternion.Euler(0f, yaw * Mathf.Rad2Deg, 0f));
             punch.Rewind();
             Rig.Body.localRotation = Quaternion.identity;
@@ -129,29 +133,34 @@ namespace TankerJam.Game
             bumpActive = true;
             bumpT = 0f;
             bumpDist = freeDistance + extra;
-            var d = BoardLayout.Dir(Def.Facing);
-            bumpDir = new Vector3(d.X, 0f, d.Z);
+            bumpDir = new Vector3(homeHeading.X, 0f, homeHeading.Z);
         }
 
-        public void DriveTo(int bay, RouteBuilder routes, float parkZ)
+        /// <summary>Out of the lot along the truck's heading, round the ring road, into the bay (any tilt).</summary>
+        public void DriveTo(int bay, RouteBuilder routes, BoardLayout layout)
         {
             EndBump();
             Bay = bay;
+            parkAxis = layout.BayAxis;
             var p = Transform.position;
-            routes.ToBay(path, new Vec2(p.x, p.z), Def.Facing, bay, parkZ);
+            routes.ToBay(path, new Vec2(p.x, p.z), homeHeading, layout.ParkCenter(bay, Rig.TankCenterZ), parkAxis);
             BeginPath(TruckState.Driving);
             Rig.TapCollider.enabled = false;
         }
 
-        public void LiftTo(int bay, Vector3 target)
+        /// <summary>VIP lift: fly in an arc straight into the bay's parked pose.</summary>
+        public void LiftTo(int bay, BoardLayout layout)
         {
             EndBump();
             Bay = bay;
             State = TruckState.Lifting;
+            parkAxis = layout.BayAxis;
             liftT = 0f;
             liftFrom = Transform.position;
-            liftTo = target;
+            var c = layout.ParkCenter(bay, Rig.TankCenterZ);
+            liftTo = new Vector3(c.X, 0f, c.Z);
             liftYaw0 = yaw;
+            liftTargetYaw = BoardLayout.Yaw(parkAxis);
             Rig.TapCollider.enabled = false;
         }
 
@@ -223,7 +232,7 @@ namespace TankerJam.Game
                     if (fullT > tuning.FullHoldTime)
                     {
                         var p = Transform.position;
-                        routes.Leave(path, new Vec2(p.x, p.z));
+                        routes.Leave(path, new Vec2(p.x, p.z), parkAxis);
                         BeginPath(TruckState.Leaving);
                         clearedBay = false;
                         ev |= TruckEvents.StartedLeaving;
@@ -259,8 +268,7 @@ namespace TankerJam.Game
             float e = u < 0.5f ? 2f * u * u : 1f - Mathf.Pow(-2f * u + 2f, 2f) / 2f;
             var p = Vector3.Lerp(liftFrom, liftTo, e);
             p.y = Mathf.Sin(Mathf.PI * u) * tuning.VipArcHeight;
-            float targetYaw = YawOf(Facing.U);
-            yaw = liftYaw0 + WrapAngle(targetYaw - liftYaw0) * e;
+            yaw = liftYaw0 + WrapAngle(liftTargetYaw - liftYaw0) * e;
             roll = Mathf.Sin(time * 6f) * 0.05f * (1f - u);
             Transform.SetPositionAndRotation(p, Quaternion.Euler(0f, yaw * Mathf.Rad2Deg, 0f));
             if (u < 1f) return TruckEvents.None;

@@ -191,6 +191,45 @@ namespace TankerJam.Game
         public void Quad(Vector3 center, float width, float length, Color32 color) =>
             Quad(Matrix4x4.TRS(center, Quaternion.identity, Vector3.one), width, length, color, new Rect(0, 0, 1, 1));
 
+        /// <summary>Flat convex polygon facing +Y at height y. Points in XZ, ordered by increasing angle (atan2(z, x)).</summary>
+        public void FlatPolygon(IList<Vector2> pointsXZ, float y, Color32 color)
+        {
+            var m = Matrix4x4.identity;
+            var c = Vector2.zero;
+            foreach (var p in pointsXZ) c += p;
+            c /= pointsXZ.Count;
+            int center = AddVertex(m, new Vector3(c.x, y, c.y), Vector3.up, color, new Vector2(0.5f, 0.5f));
+            int start = verts.Count;
+            foreach (var p in pointsXZ) AddVertex(m, new Vector3(p.x, y, p.y), Vector3.up, color, new Vector2(0.5f, 0.5f));
+            int n = pointsXZ.Count;
+            for (int i = 0; i < n; i++) Tri(center, start + (i + 1) % n, start + i);
+        }
+
+        /// <summary>Outline points of a rounded rectangle centered at <paramref name="center"/> (XZ), increasing angle.</summary>
+        public static void RoundedRectPoints(List<Vector2> into, Vector2 center, float width, float height, float radius, int arcSteps = 8)
+        {
+            into.Clear();
+            float hx = width / 2f, hz = height / 2f, r = Mathf.Clamp(radius, 0f, Mathf.Min(hx, hz));
+            var corners = new[] { new Vector2(hx - r, hz - r), new Vector2(-hx + r, hz - r), new Vector2(-hx + r, -hz + r), new Vector2(hx - r, -hz + r) };
+            for (int q = 0; q < 4; q++)
+                for (int k = 0; k <= arcSteps; k++)
+                {
+                    float a = (q * 90f + k * 90f / arcSteps) * Mathf.Deg2Rad;
+                    into.Add(center + corners[q] + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r);
+                }
+        }
+
+        /// <summary>Outline points of a circle (XZ), increasing angle.</summary>
+        public static void CirclePoints(List<Vector2> into, Vector2 center, float radius, int segments = 64)
+        {
+            into.Clear();
+            for (int i = 0; i < segments; i++)
+            {
+                float a = i * Mathf.PI * 2f / segments;
+                into.Add(center + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * radius);
+            }
+        }
+
         // ---------- output ----------
 
         public Mesh ToMesh(string name, Mesh reuse = null)

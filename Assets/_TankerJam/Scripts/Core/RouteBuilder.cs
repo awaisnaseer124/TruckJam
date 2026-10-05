@@ -32,42 +32,69 @@ namespace TankerJam.Core
         }
 
         /// <summary>Where a truck at <paramref name="from"/> facing <paramref name="facing"/> joins the ring road.</summary>
-        public Vec2 RingEntry(Vec2 from, Facing facing)
+        public Vec2 RingEntry(Vec2 from, Facing facing) => RingEntry(from, BoardLayout.Dir(facing));
+
+        /// <summary>Where a truck at <paramref name="from"/> (inside the ring) driving along world direction
+        /// <paramref name="dir"/> first meets the ring road. The result lies exactly on a ring line.</summary>
+        public Vec2 RingEntry(Vec2 from, Vec2 dir)
         {
-            switch (facing)
+            float tx = dir.X > 1e-6f ? (rx - from.X) / dir.X : dir.X < -1e-6f ? (-rx - from.X) / dir.X : float.PositiveInfinity;
+            float tz = dir.Z > 1e-6f ? (rb - from.Z) / dir.Z : dir.Z < -1e-6f ? (rt - from.Z) / dir.Z : float.PositiveInfinity;
+            if (tx < tz)
             {
-                case Facing.U: return new Vec2(from.X, rt);
-                case Facing.D: return new Vec2(from.X, rb);
-                case Facing.L: return new Vec2(-BoardLayout.XSign * rx, from.Z);
-                default: return new Vec2(BoardLayout.XSign * rx, from.Z);
+                float x = dir.X > 0f ? rx : -rx;
+                return new Vec2(x, Clamp(from.Z + dir.Z * tx, rt, rb));
             }
+            float z = dir.Z > 0f ? rb : rt;
+            return new Vec2(Clamp(from.X + dir.X * tz, -rx, rx), z);
         }
 
-        /// <summary>Lot → ring road → under the bay → up into the bay, parked at <paramref name="parkZ"/>.</summary>
-        public void ToBay(PolylinePath path, Vec2 from, Facing facing, int bay, float parkZ)
+        static float Clamp(float v, float lo, float hi) => v < lo ? lo : v > hi ? hi : v;
+
+        /// <summary>Lot → ring road → under the bay → up into the bay, parked at <paramref name="parkZ"/> (straight bays).</summary>
+        public void ToBay(PolylinePath path, Vec2 from, Facing facing, int bay, float parkZ) =>
+            ToBay(path, from, BoardLayout.Dir(facing), new Vec2(layout.BayX(bay), parkZ), new Vec2(0f, -1f));
+
+        /// <summary>
+        /// From a lot position along world heading <paramref name="dir"/> to the ring road, the shorter way round
+        /// to below the bay, then into the bay ending at <paramref name="parkCenter"/> facing <paramref name="parkAxis"/>.
+        /// Tilted bays are entered along their axis from an approach point behind the parked position.
+        /// </summary>
+        public void ToBay(PolylinePath path, Vec2 from, Vec2 dir, Vec2 parkCenter, Vec2 parkAxis)
         {
             path.Clear();
-            var entry = RingEntry(from, facing);
-            float bx = layout.BayX(bay);
-            var target = new Vec2(bx, rt);
-
+            var entry = RingEntry(from, dir);
             path.AddPoint(from);
             path.AddPoint(entry);
-            AddRingCorners(path, entry, target);
-            if (Math.Abs(entry.X - target.X) > Tolerance || Math.Abs(entry.Z - target.Z) > Tolerance)
-                path.AddPoint(target);
-            path.AddPoint(bx, parkZ);
+
+            bool straight = Math.Abs(parkAxis.X) < 1e-3f;
+            Vec2 approach = straight ? parkCenter : parkCenter - parkAxis * ApproachLength;
+            var foot = new Vec2(Clamp(approach.X, -rx, rx), rt);
+            AddRingCorners(path, entry, foot);
+            if (Math.Abs(entry.X - foot.X) > Tolerance || Math.Abs(entry.Z - foot.Z) > Tolerance)
+                path.AddPoint(foot);
+            if (!straight) path.AddPoint(approach);
+            path.AddPoint(parkCenter);
             path.Build(layout.P.CornerRadius);
         }
 
-        /// <summary>Bay → forward onto the exit road → off the nearest screen side.</summary>
-        public void Leave(PolylinePath path, Vec2 from)
+        /// <summary>How far behind its parked position a truck lines up with a tilted bay before driving in.</summary>
+        public const float ApproachLength = 2f;
+
+        /// <summary>Bay → forward onto the exit road → off the nearest screen side (straight bays).</summary>
+        public void Leave(PolylinePath path, Vec2 from) => Leave(path, from, new Vec2(0f, -1f));
+
+        /// <summary>Bay → forward along <paramref name="axis"/> onto the exit road → off the nearest screen side.</summary>
+        public void Leave(PolylinePath path, Vec2 from, Vec2 axis)
         {
             path.Clear();
-            float side = from.X <= 0f ? -layout.P.ExitSideX : layout.P.ExitSideX;
+            float exitZ = layout.P.ExitZ;
+            float t = axis.Z < -1e-3f ? (exitZ - from.Z) / axis.Z : 0f;
+            var onRoad = Math.Abs(axis.X) < 1e-3f ? new Vec2(from.X, exitZ) : new Vec2(from.X + axis.X * t, exitZ);
+            float side = onRoad.X <= 0f ? -layout.P.ExitSideX : layout.P.ExitSideX;
             path.AddPoint(from);
-            path.AddPoint(from.X, layout.P.ExitZ);
-            path.AddPoint(side, layout.P.ExitZ);
+            path.AddPoint(onRoad);
+            path.AddPoint(side, exitZ);
             path.Build(layout.P.LeaveCornerRadius);
         }
 

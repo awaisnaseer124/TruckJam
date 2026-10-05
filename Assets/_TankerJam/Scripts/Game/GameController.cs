@@ -231,13 +231,13 @@ namespace TankerJam.Game
                     break;
                 case TapOutcome.Assigned:
                     RegisterUnits(r);
-                    t.DriveTo(r.Bay, routes, layout.ParkZ(t.Rig.TankCenterZ));
+                    t.DriveTo(r.Bay, routes, layout);
                     SetStatus("");
                     Raise(GameCue.Depart);
                     break;
                 case TapOutcome.VipLifted:
                     RegisterUnits(r);
-                    t.LiftTo(r.Bay, new Vector3(layout.BayX(r.Bay), 0f, layout.ParkZ(t.Rig.TankCenterZ)));
+                    t.LiftTo(r.Bay, layout);
                     bayRow.Sync(Session.Bays, layout, config.Palette);
                     SetStatus("VIP lift! The truck goes straight to the VIP bay.");
                     BoostersChanged?.Invoke();
@@ -309,7 +309,7 @@ namespace TankerJam.Game
         void Update()
         {
             if (Session == null) return;
-            if (InputEnabled && EndState == EndState.Playing && gameCamera != null && input.TryGetTappedTruck(gameCamera, out var rig))
+            if (InputEnabled && EndState == EndState.Playing && gameCamera != null && input.TryGetTappedTruck(gameCamera, trucks, out var rig))
             {
                 int id = IndexOf(rig);
                 if (id >= 0) TapTruck(id);

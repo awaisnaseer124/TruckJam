@@ -41,28 +41,31 @@ namespace TankerJam.Game
         {
             kit.Clear();
             decalKit.Clear();
-            float w = L.P.BayWidth, len = L.P.BayLength, z = L.BayPlaneZ;
+            float w = L.P.BayWidth, len = L.P.BayLength;
+            // Stall frame: local +Z runs along the bay axis (toward the hose), so tilted bays just rotate.
+            var rot = Quaternion.Euler(0f, BoardLayout.Yaw(L.BayAxis) * Mathf.Rad2Deg, 0f);
             for (int i = 0; i < bays.Count; i++)
             {
                 var bay = bays[i];
-                float x = L.BayX(i);
+                var c2 = L.StallCenter(i);
+                frame = Matrix4x4.TRS(new Vector3(c2.X, Y, c2.Z), rot, Vector3.one);
                 lastOpen[i] = bay.Open;
                 if (bay.Kind == BayKind.Extra && !bay.Open)
                 {
                     var green = MeshKit.Fixed(pal.ExtraLocked);
-                    Dashed(x, z, w - 0.1f, len - 0.1f, green);
-                    kit.Quad(new Vector3(x, Y, z), 0.5f, 0.1f, green);
-                    kit.Quad(new Vector3(x, Y, z), 0.1f, 0.5f, green);
+                    Dashed(w - 0.1f, len - 0.1f, green);
+                    Local(0f, 0f, 0.5f, 0.1f, green);
+                    Local(0f, 0f, 0.1f, 0.5f, green);
                     continue;
                 }
                 var c = MeshKit.Fixed(bay.Kind == BayKind.Vip ? pal.Vip : Color.white);
-                Outline(x, z, w - 0.1f, len - 0.1f, c);
+                Outline(w - 0.1f, len - 0.1f, c);
                 if (bay.Kind == BayKind.Vip)
                 {
-                    // "VIP" along the bay near its bottom end, reading up the screen (local X -> world -Z).
+                    // "VIP" along the bay near its open (camera-side) end, reading up the stall.
                     var gold = (Color32)pal.Vip.linear;
                     gold.a = 255;
-                    var m = Matrix4x4.TRS(new Vector3(x, Y + 0.002f, z + len / 2f - 0.95f), Quaternion.Euler(0f, 90f, 0f), Vector3.one);
+                    var m = frame * Matrix4x4.TRS(new Vector3(0f, 0.002f, -(len / 2f - 0.95f)), Quaternion.Euler(0f, -90f, 0f), Vector3.one);
                     decalKit.Quad(m, 1.29f, 0.43f, gold, DecalAtlasLayout.Vip);
                 }
             }
@@ -79,28 +82,34 @@ namespace TankerJam.Game
                 if (bays[i].Open != lastOpen[i]) { Rebuild(bays, L, pal); return; }
         }
 
-        void Outline(float x, float z, float w, float l, Color32 c)
+        static readonly Rect FullUv = new Rect(0, 0, 1, 1);
+        Matrix4x4 frame;
+
+        void Local(float x, float z, float w, float l, Color32 c) =>
+            kit.Quad(frame * Matrix4x4.Translate(new Vector3(x, 0f, z)), w, l, c, FullUv);
+
+        void Outline(float w, float l, Color32 c)
         {
-            kit.Quad(new Vector3(x, Y, z - l / 2f), w, Line, c);
-            kit.Quad(new Vector3(x, Y, z + l / 2f), w, Line, c);
-            kit.Quad(new Vector3(x - w / 2f, Y, z), Line, l, c);
-            kit.Quad(new Vector3(x + w / 2f, Y, z), Line, l, c);
+            Local(0f, -l / 2f, w, Line, c);
+            Local(0f, l / 2f, w, Line, c);
+            Local(-w / 2f, 0f, Line, l, c);
+            Local(w / 2f, 0f, Line, l, c);
         }
 
-        void Dashed(float x, float z, float w, float l, Color32 c)
+        void Dashed(float w, float l, Color32 c)
         {
             const float dash = 0.22f, gap = 0.14f;
             for (float s = -l / 2f; s < l / 2f; s += dash + gap)
             {
                 float e = Mathf.Min(s + dash, l / 2f), mid = (s + e) / 2f;
-                kit.Quad(new Vector3(x - w / 2f, Y, z + mid), Line, e - s, c);
-                kit.Quad(new Vector3(x + w / 2f, Y, z + mid), Line, e - s, c);
+                Local(-w / 2f, mid, Line, e - s, c);
+                Local(w / 2f, mid, Line, e - s, c);
             }
             for (float s = -w / 2f; s < w / 2f; s += dash + gap)
             {
                 float e = Mathf.Min(s + dash, w / 2f), mid = (s + e) / 2f;
-                kit.Quad(new Vector3(x + mid, Y, z - l / 2f), e - s, Line, c);
-                kit.Quad(new Vector3(x + mid, Y, z + l / 2f), e - s, Line, c);
+                Local(mid, -l / 2f, e - s, Line, c);
+                Local(mid, l / 2f, e - s, Line, c);
             }
         }
     }

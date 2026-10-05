@@ -288,6 +288,16 @@ namespace TankerJam.App
             }
         }
 
+        /// <summary>Development helper: play a level that isn't in the catalog (e.g. a free-form sample).</summary>
+        public void DevPlayLevel(LevelDef level)
+        {
+            home.Hide();
+            popup.Hide();
+            tutorial.Hide();
+            game.Load(level, progress.Boosters(BoosterKind.Vip), progress.Boosters(BoosterKind.Extra));
+            game.InputEnabled = true;
+        }
+
         public void DevResetProgress()
         {
             progress.Reset();

@@ -141,3 +141,18 @@ The reference is symmetric. Random placement won't produce that; **patterns** wi
   0.1; largest gap 8 points); unsolvable and jam-depth cases; a radial free-form level solves.
 - `Tanker Jam > Levels > Score All Levels` writes Temp/TankerJamScores.txt. Python is reference only
   (Tools/levelgen/README.md); build_curve.py still generates the grid curve until F5.
+
+**F3 done (2026-10-05).**
+- Trucks are placed from their pose (grid or free-form) through `BoardLayout.ToWorld` / `TruckHeading`;
+  routes leave along the truck's heading to the ring road (`RouteBuilder.RingEntry` with a direction).
+- Board shapes drawn by `SceneryBuilder`: checker for grid levels, layered disc for circles, filled
+  rounded rectangle; obstacles from `LevelDef.CollectObstacles`.
+- 45 deg bays (`LayoutParams.BayAngle`, set to 45 in LayoutConfig; code default 0 keeps the prototype
+  numbers): stalls, VIP label and the dashed extra bay rotate with the bay axis; trucks line up behind a
+  tilted stall, park with the hatch under the hose, and leave along the axis. VIP lift turns to the axis.
+- Tap tolerance: when the raycast misses, `TapInput.Nearest` picks the lot truck whose on-screen center
+  line is within 3.5% of screen height of the tap.
+- `SampleLevels.Radial` (8 spokes x 2 trucks around a center cone, solved on build);
+  menu `Tanker Jam > Dev > Play Radial Sample`.
+- Gate passed: the radial level wins end to end in PlayMode (`RadialFreeFormLevelWinsEndToEnd`); all grid
+  tests still pass with 45 deg bays. Tests: 578 EditMode, 14 PlayMode, all green.

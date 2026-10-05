@@ -59,6 +59,36 @@ namespace TankerJam.Tests
         }
 
         [Test]
+        public void RadialFreeFormLevelWinsEndToEnd()
+        {
+            // F3 gate: a free-form circle board (trucks at 45-degree steps) plays through the real views.
+            game.Load(SampleLevels.Radial(), 1, 1);
+            var solver = new SolutionPlayer();
+            Simulate(300f, () => game.EndState != EndState.Playing, solver);
+            Assert.AreEqual(EndState.Won, game.EndState, $"Ended {game.EndState} at solution step {solver.Step}. Status: {game.Status}");
+            for (int i = 0; i < game.TruckCount; i++)
+                Assert.AreEqual(TruckState.Gone, game.Truck(i).State, $"Truck {i}");
+        }
+
+        [Test]
+        public void TapNearASmallTruckPicksIt()
+        {
+            game.Load(SampleLevels.Radial(), 1, 1);
+            var cam = game.GameCamera;
+            Assert.IsNotNull(cam);
+            var trucks = new System.Collections.Generic.List<TruckView>();
+            for (int i = 0; i < game.TruckCount; i++) trucks.Add(game.Truck(i));
+            var t = game.Truck(0);
+            Vector2 center = cam.WorldToScreenPoint(t.Transform.position);
+            var side = cam.WorldToScreenPoint(t.Transform.position + t.Transform.right) - cam.WorldToScreenPoint(t.Transform.position);
+            // Just beside the truck body (half width 0.4) but inside the finger radius.
+            var near = center + (Vector2)side.normalized * (0.02f * cam.pixelHeight);
+            Assert.AreEqual(t.Rig, TapInput.Nearest(cam, near, trucks));
+            var far = center + (Vector2)side.normalized * (0.2f * cam.pixelHeight);
+            Assert.AreNotEqual(t.Rig, TapInput.Nearest(cam, far, trucks));
+        }
+
+        [Test]
         public void BlockedTapBumpsAndReturnsHome()
         {
             // Truck 0 faces up in column 1; truck 8 covers (1,0).

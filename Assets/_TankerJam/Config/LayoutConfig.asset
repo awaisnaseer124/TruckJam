@@ -18,6 +18,8 @@ MonoBehaviour:
     RingTopGap: 0.75
     RoadWidth: 1.2
     BaySpacing: 1.4
+    BayAngle: 45
+    AngledBaySpacing: 1.7
     BayWidth: 1.18
     BayLength: 4.1
     HoseZ: -3.75
