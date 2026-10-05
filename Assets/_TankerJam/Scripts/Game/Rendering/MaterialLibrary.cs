@@ -35,7 +35,8 @@ namespace TankerJam.Game
             // Front faces only, and faint: blending happens in linear space, where a white veil brightens far
             // more than in the prototype's gamma-space blending. The fresnel rim carries the "glass" read.
             Glass = MakeTransparent("Glass", new Color(1f, 1f, 1f, 0.07f), 0.95f, CullMode.Back);
-            Glass.SetFloat("_Rim", 0.35f);
+            Glass.SetFloat("_Rim", 0.5f);
+            Glass.SetFloat("_Streak", 0.45f);
             Decals = new Material(config.Decal) { name = "Decals", enableInstancing = true };
             VesselLiquid = new Material(config.VesselLiquid) { name = "VesselLiquid" };
             if (config.DecalAtlas != null) Decals.SetTexture(BaseMapId, config.DecalAtlas);
