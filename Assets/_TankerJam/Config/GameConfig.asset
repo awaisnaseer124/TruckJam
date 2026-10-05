@@ -24,5 +24,7 @@ MonoBehaviour:
   LiquidFill: {fileID: 4800000, guid: ed7852986fdcad444ae306f392c1f9ef, type: 3}
   Decal: {fileID: 4800000, guid: 97c50a996489fa44e821650d211e5f98, type: 3}
   VesselLiquid: {fileID: 4800000, guid: 7499fad1272811442b2df7cb760ebc16, type: 3}
+  ToyLitTextured: {fileID: 4800000, guid: c247480a4ff055a43a4793255ad78c4a, type: 3}
+  Environment: {fileID: 11400000, guid: 6bf80f4a3b9118a4782e89bbfa96035f, type: 2}
   DecalAtlas: {fileID: 2800000, guid: bdda1697c291e9e48aa81897d0a3f377, type: 3}
   TruckLayer: Trucks

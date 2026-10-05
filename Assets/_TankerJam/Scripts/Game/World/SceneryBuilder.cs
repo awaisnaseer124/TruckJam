@@ -18,7 +18,7 @@ namespace TankerJam.Game
 
         const float RoadY = 0.01f, LotY = 0.02f, PadY = 0.012f;
 
-        public void Build(Transform parent, LevelDef level, BoardLayout L, Palette pal, MaterialLibrary mats)
+        public void Build(Transform parent, LevelDef level, BoardLayout L, Palette pal, MaterialLibrary mats, EnvironmentTheme theme = null)
         {
             if (staticRenderer == null)
             {
@@ -30,7 +30,7 @@ namespace TankerJam.Game
             var p = L.P;
 
             // Ground.
-            kit.Quad(new Vector3(0, 0, L.LotCenter.Z - 6f), 90f, 90f, MeshKit.Fixed(pal.Ground));
+            kit.Quad(new Vector3(0, 0, L.LotCenter.Z - 6f), 90f, 90f, MeshKit.Fixed(theme != null ? theme.Ground : pal.Ground));
 
             // Ring road and exit road.
             float w = p.RoadWidth;
@@ -46,8 +46,8 @@ namespace TankerJam.Game
                 kit.Box(new Vector3(x, 0.02f, p.ExitZ), new Vector3(0.6f, 0.02f, 0.07f), white);
 
             // Lot checker (vertex colored cells) with a white border.
-            var light = MeshKit.Fixed(pal.LotLight);
-            var dark = MeshKit.Fixed(pal.LotDark);
+            var light = MeshKit.Fixed(theme != null ? theme.LotLight : pal.LotLight);
+            var dark = MeshKit.Fixed(theme != null ? theme.LotDark : pal.LotDark);
             for (int y = 0; y < L.Size; y++)
                 for (int x = 0; x < L.Size; x++)
                 {

@@ -54,6 +54,7 @@ namespace TankerJam.Game
         RouteBuilder routes;
         MaterialLibrary mats;
         SceneryBuilder scenery;
+        EnvironmentView environment;
         FlowFx flow;
         TapInput input;
         Transform boardRoot, truckRoot;
@@ -107,6 +108,7 @@ namespace TankerJam.Game
             truckRoot.SetParent(transform, false);
             pump = new PumpView(boardRoot, config.Palette, mats);
             bayRow = new BayRowView(boardRoot, mats);
+            environment = new EnvironmentView(boardRoot);
             if (gameCamera != null) gameCamera.backgroundColor = config.Palette.Sky;
             if (lighting != null) lighting.Apply(config.Palette);
         }
@@ -137,7 +139,8 @@ namespace TankerJam.Game
             time = calm = glugTimer = blobTimer = 0f;
             bottomSignature = -1;
 
-            scenery.Build(boardRoot, level, layout, config.Palette, mats);
+            scenery.Build(boardRoot, level, layout, config.Palette, mats, config.Environment);
+            environment.Apply(config.Environment);
             BuildVessels();
             BuildHoses();
             bayRow.Rebuild(Session.Bays, layout, config.Palette);

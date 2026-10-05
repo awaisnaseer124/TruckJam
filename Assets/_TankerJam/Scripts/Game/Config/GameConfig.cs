@@ -20,6 +20,11 @@ namespace TankerJam.Game
         public Shader LiquidFill;
         public Shader Decal;
         public Shader VesselLiquid;
+        public Shader ToyLitTextured;
+
+        [Header("Environment")]
+        [Tooltip("Decoration and ground colors around the board. Empty = plain GDD look.")]
+        public EnvironmentTheme Environment;
 
         [Header("Textures")]
         public Texture2D DecalAtlas;
