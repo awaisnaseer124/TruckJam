@@ -59,7 +59,14 @@ namespace TankerJam.UI
             gameObject.SetActive(false);
         }
 
-        void OnDestroy() => showSeq?.Kill();
+        void OnDestroy() => KillShow();
+
+        // Killed tweens go back to DOTween's pool: drop the reference so it is never killed twice.
+        void KillShow()
+        {
+            showSeq?.Kill();
+            showSeq = null;
+        }
 
         public bool IsOpen => gameObject.activeSelf;
 
@@ -112,10 +119,10 @@ namespace TankerJam.UI
             }
 
             gameObject.SetActive(true);
-            showSeq?.Kill();
+            KillShow();
             group.alpha = 0f;
             card.localScale = Vector3.one * 0.85f;
-            showSeq = DOTween.Sequence().SetUpdate(true)
+            showSeq = DOTween.Sequence().SetUpdate(true).SetLink(gameObject)
                 .Append(group.DOFade(1f, 0.2f))
                 .Join(card.DOScale(1f, 0.35f).SetEase(Ease.OutBack));
             if (starsRow.activeSelf)
@@ -128,7 +135,7 @@ namespace TankerJam.UI
 
         public void Hide()
         {
-            showSeq?.Kill();
+            KillShow();
             gameObject.SetActive(false);
         }
     }

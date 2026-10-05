@@ -28,7 +28,7 @@ namespace TankerJam.UI
         void Awake()
         {
             playButton.onClick.AddListener(() => PlayClicked?.Invoke());
-            breathe = playRect.DOScale(1.05f, 0.7f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine).SetAutoKill(false).SetUpdate(true).Pause();
+            breathe = playRect.DOScale(1.05f, 0.7f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine).SetAutoKill(false).SetUpdate(true).SetLink(gameObject).Pause();
         }
 
         void OnDestroy() => breathe?.Kill();

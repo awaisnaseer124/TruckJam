@@ -76,6 +76,19 @@ namespace TankerJam.Tests
         }
 
         [Test]
+        public void TruckLeavesAtFullSpeedOnTheFirstFrame()
+        {
+            var tuning = game.Config.Tuning;
+            if (tuning.DriveAccel > 0f) Assert.Ignore("Ramped acceleration is configured.");
+            var t = game.Truck(3);
+            var start = t.Transform.position;
+            game.TapTruck(3);
+            game.Advance(Dt);
+            float moved = Vector3.Distance(start, t.Transform.position);
+            Assert.AreEqual(tuning.DriveMaxSpeed * Dt, moved, 0.02f, "Uniform motion: no ramp-up after a tap.");
+        }
+
+        [Test]
         public void TapsDuringMotionAreIgnored()
         {
             game.TapTruck(3);

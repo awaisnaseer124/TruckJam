@@ -36,7 +36,7 @@ namespace TankerJam.UI
             button.onClick.AddListener(() => Clicked?.Invoke());
             armedOutline.gameObject.SetActive(false);
             pulse = armedOutline.transform.DOScale(1.06f, 0.5f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine)
-                                .SetAutoKill(false).SetUpdate(true).Pause();
+                                .SetAutoKill(false).SetUpdate(true).SetLink(gameObject).Pause();
         }
 
         void OnDestroy() => pulse?.Kill();

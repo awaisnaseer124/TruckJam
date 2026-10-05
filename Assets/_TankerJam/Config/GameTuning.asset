@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb4db044cb708c148a747bbfeaa79f65, type: 3}
   m_Name: GameTuning
   m_EditorClassIdentifier: TankerJam.Game::TankerJam.Game.GameTuning
-  DriveMaxSpeed: 10
-  DriveAccel: 15
-  BrakeDecel: 12
-  LeaveMaxSpeed: 9
-  LeaveAccel: 9
-  LoadedSlowdown: 0.3
+  DriveMaxSpeed: 11
+  DriveAccel: 0
+  BrakeDecel: 0
+  LeaveMaxSpeed: 11
+  LeaveAccel: 0
+  LoadedSlowdown: 0
   HeadingSharpness: 16
   WheelRadius: 0.17
   ReleaseBayAfter: 1.6
@@ -27,9 +27,9 @@ MonoBehaviour:
   VipDuration: 1.5
   VipArcHeight: 3.2
   UnitDuration: 0.34
-  HoseLowerSpeed: 2.4
+  HoseLowerSpeed: 5
   HoseRaiseSpeed: 3
-  FullHoldTime: 0.75
+  FullHoldTime: 0.35
   SloshStiffness: 55
   SloshDamping: 3
   PitchStiffness: 160

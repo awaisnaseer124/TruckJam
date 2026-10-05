@@ -12,8 +12,8 @@ namespace TankerJam.UI
 
         void Awake()
         {
-            down = transform.DOScale(pressedScale, 0.08f).SetEase(Ease.OutQuad).SetAutoKill(false).SetUpdate(true).Pause();
-            up = transform.DOScale(1f, 0.25f).SetEase(Ease.OutBack).SetAutoKill(false).SetUpdate(true).Pause();
+            down = transform.DOScale(pressedScale, 0.08f).SetEase(Ease.OutQuad).SetAutoKill(false).SetUpdate(true).SetLink(gameObject).Pause();
+            up = transform.DOScale(1f, 0.25f).SetEase(Ease.OutBack).SetAutoKill(false).SetUpdate(true).SetLink(gameObject).Pause();
         }
 
         void OnDestroy()

@@ -48,8 +48,8 @@ namespace TankerJam.UI
             vipButton.Clicked += () => VipClicked?.Invoke();
             extraButton.Clicked += () => ExtraClicked?.Invoke();
             statusGroup.alpha = 0f;
-            statusFade = statusGroup.DOFade(1f, 0.25f).SetAutoKill(false).SetUpdate(true).Pause();
-            coinPunch = coinsLabel.transform.DOPunchScale(Vector3.one * 0.25f, 0.4f, 6, 0.6f).SetAutoKill(false).SetUpdate(true).Pause();
+            statusFade = statusGroup.DOFade(1f, 0.25f).SetAutoKill(false).SetUpdate(true).SetLink(gameObject).Pause();
+            coinPunch = coinsLabel.transform.DOPunchScale(Vector3.one * 0.25f, 0.4f, 6, 0.6f).SetAutoKill(false).SetUpdate(true).SetLink(gameObject).Pause();
         }
 
         void OnDestroy()

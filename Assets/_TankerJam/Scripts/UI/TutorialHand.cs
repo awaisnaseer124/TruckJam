@@ -31,7 +31,7 @@ namespace TankerJam.UI
         void Awake()
         {
             canvas = GetComponentInParent<Canvas>().rootCanvas;
-            bob = hand.DOScale(0.85f, 0.45f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine).SetAutoKill(false).SetUpdate(true).Pause();
+            bob = hand.DOScale(0.85f, 0.45f).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutSine).SetAutoKill(false).SetUpdate(true).SetLink(gameObject).Pause();
             gameObject.SetActive(false);
         }
 

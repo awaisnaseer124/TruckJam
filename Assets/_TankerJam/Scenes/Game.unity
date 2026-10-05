@@ -1331,6 +1331,10 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
+    - target: {fileID: 5360763522056179226, guid: bf0e0650b529810429d4393f0bf40804, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 5364919688085956685, guid: bf0e0650b529810429d4393f0bf40804, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
@@ -1359,6 +1363,14 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
+    - target: {fileID: 6719060567108039883, guid: bf0e0650b529810429d4393f0bf40804, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 6751815776416027975, guid: bf0e0650b529810429d4393f0bf40804, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 7254025280543102667, guid: bf0e0650b529810429d4393f0bf40804, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
@@ -1368,6 +1380,14 @@ PrefabInstance:
       value: 4278199354
       objectReference: {fileID: 0}
     - target: {fileID: 7462507558178816162, guid: bf0e0650b529810429d4393f0bf40804, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 7627909698559416809, guid: bf0e0650b529810429d4393f0bf40804, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4281541662
+      objectReference: {fileID: 0}
+    - target: {fileID: 7627909698559416809, guid: bf0e0650b529810429d4393f0bf40804, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
@@ -1384,6 +1404,14 @@ PrefabInstance:
       value: -1183493901
       objectReference: {fileID: 0}
     - target: {fileID: 8414219480118803750, guid: bf0e0650b529810429d4393f0bf40804, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 8977848178904247093, guid: bf0e0650b529810429d4393f0bf40804, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4281541662
+      objectReference: {fileID: 0}
+    - target: {fileID: 8977848178904247093, guid: bf0e0650b529810429d4393f0bf40804, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}

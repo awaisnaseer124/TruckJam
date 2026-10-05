@@ -76,8 +76,9 @@ namespace TankerJam.Game
             Rig = rig;
             Transform = rig.transform;
             // Built once and restarted on demand, so the juice allocates nothing during play.
+            // Linked to the truck so it dies with it (scene unload, retry) instead of touching a destroyed object.
             punch = Rig.Body.DOPunchScale(new Vector3(0.08f, 0.14f, 0.08f), 0.35f, 6, 0.6f)
-                            .SetAutoKill(false).SetRecyclable(false).Pause();
+                            .SetAutoKill(false).SetRecyclable(false).SetLink(Rig.gameObject).Pause();
         }
 
         public void Setup(TruckDef def, BoardLayout layout, MaterialLibrary mats, GameTuning gameTuning)
@@ -277,11 +278,12 @@ namespace TankerJam.Game
             float vmax = (driving ? tuning.DriveMaxSpeed : tuning.LeaveMaxSpeed) * (1f - tuning.LoadedSlowdown * load);
             float acc = driving ? tuning.DriveAccel : tuning.LeaveAccel * (1f - tuning.LoadedSlowdown * load);
             float rem = path.Length - s;
-            float want = Mathf.Min(vmax, v + acc * dt);
-            if (driving) want = Mathf.Min(want, Mathf.Sqrt(Mathf.Max(0f, 2f * tuning.BrakeDecel * rem)));
+            // Acceleration 0 = full speed from the first frame; braking 0 = constant speed up to an exact stop.
+            float want = acc > 0f ? Mathf.Min(vmax, v + acc * dt) : vmax;
+            if (driving && tuning.BrakeDecel > 0f) want = Mathf.Min(want, Mathf.Sqrt(Mathf.Max(0f, 2f * tuning.BrakeDecel * rem)));
             float a = (want - v) / dt;
             v = want;
-            s += v * dt;
+            s = Mathf.Min(path.Length, s + v * dt);
 
             path.Sample(s, ref cursor, out var p, out float heading);
             yaw += WrapAngle(heading - yaw) * Mathf.Min(1f, dt * tuning.HeadingSharpness);
@@ -307,10 +309,12 @@ namespace TankerJam.Game
                     ev |= TruckEvents.Gone;
                 }
             }
-            else if (rem < 0.02f)
+            else if (path.Length - s < 0.02f)
             {
                 State = TruckState.Parked;
                 v = 0f;
+                yaw = heading; // sit square in the bay
+                Transform.rotation = Quaternion.Euler(0f, yaw * Mathf.Rad2Deg, 0f);
                 sloshV += 1.4f;
                 pitchV -= 0.8f;
                 ev |= TruckEvents.Parked;
