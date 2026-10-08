@@ -49,4 +49,4 @@ On your Android phone, open the link, download the APK from the Google Drive fol
 
 ## Author
 
-Made by **Awais Naseer**.
+Made by **Awais Naseer**, developed with [Claude](https://claude.com/claude-code) by Anthropic.
