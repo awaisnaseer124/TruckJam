@@ -3,7 +3,9 @@
 A casual mobile puzzle game made in **Unity 6**. Tap tanker trucks to drive them out of a crowded lot, park them in the bays, and pump their colored fuel into the matching vessels. Choose your order carefully: if the bays fill up with the wrong colors, the lot jams.
 
 <p align="center">
-  <img src="Docs/Screenshots/gameplay.png" alt="Tanker Jam gameplay" width="320">
+  <img src="Docs/Screenshots/gameplay.gif" alt="Tanker Jam gameplay: a full level from first tap to level clear" width="300">
+  &nbsp;&nbsp;
+  <img src="Docs/Screenshots/gameplay.png" alt="Tanker Jam gameplay screenshot" width="300">
 </p>
 
 ## Play it
