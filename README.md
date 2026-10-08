@@ -8,9 +8,9 @@ A casual mobile puzzle game made in **Unity 6**. Tap tanker trucks to drive them
 
 ## Play it
 
-📱 **[Download the Android APK](PASTE_YOUR_APK_LINK_HERE)**
+📱 **[Download the Android APK](https://drive.google.com/drive/folders/1n6I61XEIxBu-tHMRNTjTRX6AsGMFYrDp?usp=sharing)**
 
-On your Android phone, open the link, download the APK, and allow "Install unknown apps" when asked.
+On your Android phone, open the link, download the APK from the Google Drive folder, and allow "Install unknown apps" when asked.
 
 ## Features
 
